@@ -5,9 +5,11 @@ import { useAuth } from '../contexts/AuthContext'
 import { LEVELS } from '../utils/scoring'
 import {
   Users, ClipboardList, TrendingUp, Plus, Search,
-  ChevronRight, Calendar, Star, BookOpen, Loader2,
+  ChevronRight, ChevronLeft, Calendar, Star, BookOpen, Loader2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+const PAGE_SIZE = 24
 
 function StatCard({ icon: Icon, label, value, sub, color = 'islamic' }) {
   const colors = {
@@ -119,55 +121,92 @@ export default function Dashboard() {
   const [lastTests, setLastTests]   = useState({})   // murid_id → latest hasil_tes
   const [loading, setLoading]       = useState(true)
   const [search, setSearch]         = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [stats, setStats]           = useState({ total: 0, tesHariIni: 0, rataRata: '-' })
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  // Pagination
+  const [page, setPage]             = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
-  const fetchData = async () => {
+  // Stat kartu di atas dihitung sekali lewat RPC get_dashboard_stats() (COUNT/AVG
+  // di database), bukan dengan menarik seluruh tabel murid & hasil_tes ke client.
+  const fetchStats = async () => {
+    const { data, error } = await supabase.rpc('get_dashboard_stats')
+    if (error) {
+      toast.error('Gagal memuat statistik dashboard')
+      return
+    }
+    const row = Array.isArray(data) ? data[0] : data
+    setStats({
+      total: row?.total_murid ?? 0,
+      tesHariIni: row?.tes_hari_ini ?? 0,
+      rataRata: row?.rata_rata_skor != null ? row.rata_rata_skor : '-',
+    })
+  }
+
+  // Daftar murid ditarik per halaman (.range), dengan pencarian di server
+  // (.ilike) bukan filter array di client. Tes terakhir hanya diambil untuk
+  // murid yang sedang tampil di halaman ini, dari view last_test_per_murid.
+  const fetchStudents = async (targetPage, term) => {
     setLoading(true)
-    const [{ data: muridData, error: muridErr }, { data: tesData, error: tesErr }] =
-      await Promise.all([
-        supabase.from('murid').select('*').order('nama'),
-        supabase.from('hasil_tes').select('*').order('tanggal_tes', { ascending: false }),
-      ])
+    const from = (targetPage - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
 
-    if (muridErr || tesErr) {
-      toast.error('Gagal memuat data')
+    let query = supabase.from('murid').select('*', { count: 'exact' }).order('nama')
+    const t = term.trim()
+    if (t) {
+      query = query.or(`nama.ilike.%${t}%,kelas.ilike.%${t}%,nisn.ilike.%${t}%`)
+    }
+
+    const { data: muridData, error: muridErr, count } = await query.range(from, to)
+    if (muridErr) {
+      toast.error('Gagal memuat data murid')
       setLoading(false)
       return
     }
 
     setStudents(muridData || [])
+    setTotalCount(count || 0)
 
-    // Map last test per murid
-    const lastMap = {}
-    for (const tes of (tesData || [])) {
-      if (!lastMap[tes.murid_id]) lastMap[tes.murid_id] = tes
+    const ids = (muridData || []).map((m) => m.id)
+    if (ids.length) {
+      const { data: lastTestData, error: testErr } = await supabase
+        .from('last_test_per_murid')
+        .select('*')
+        .in('murid_id', ids)
+      if (testErr) {
+        toast.error('Gagal memuat riwayat tes terakhir')
+      } else {
+        const map = {}
+        for (const tes of (lastTestData || [])) map[tes.murid_id] = tes
+        setLastTests(map)
+      }
+    } else {
+      setLastTests({})
     }
-    setLastTests(lastMap)
-
-    // Compute stats
-    const today = new Date().toISOString().split('T')[0]
-    const tesHariIni = (tesData || []).filter((t) => t.tanggal_tes === today).length
-    const allScores = (tesData || []).map((t) => t.skor_total).filter(Boolean)
-    const avg = allScores.length
-      ? (allScores.reduce((s, v) => s + v, 0) / allScores.length).toFixed(1)
-      : '-'
-    setStats({ total: muridData?.length || 0, tesHariIni, rataRata: avg })
 
     setLoading(false)
   }
 
-  const filtered = students.filter((s) =>
-    s.nama.toLowerCase().includes(search.toLowerCase()) ||
-    (s.kelas || '').toLowerCase().includes(search.toLowerCase()) ||
-    (s.nisn || '').includes(search)
-  )
+  useEffect(() => { fetchStats() }, [])
+
+  // Debounce input pencarian (350ms) supaya gak nembak query di tiap ketikan
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 350)
+    return () => clearTimeout(t)
+  }, [search])
+
+  // Reset ke halaman 1 tiap kali kata kunci berubah
+  useEffect(() => { setPage(1) }, [debouncedSearch])
+
+  useEffect(() => { fetchStudents(page, debouncedSearch) }, [page, debouncedSearch])
 
   const hour = new Date().getHours()
   const greeting = hour < 11 ? 'Selamat Pagi' : hour < 15 ? 'Selamat Siang' : 'Selamat Sore'
+
+  const from = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const to = Math.min(page * PAGE_SIZE, totalCount)
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -232,24 +271,56 @@ export default function Dashboard() {
               <p className="text-sm text-islamic-500">Memuat data murid…</p>
             </div>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : students.length === 0 ? (
           <div className="card p-12 text-center">
             <BookOpen className="w-12 h-12 text-islamic-700 mx-auto mb-3" />
             <p className="text-islamic-400 font-medium">
-              {search ? 'Murid tidak ditemukan' : 'Belum ada data murid'}
+              {debouncedSearch ? 'Murid tidak ditemukan' : 'Belum ada data murid'}
             </p>
-            {!search && (
+            {!debouncedSearch && (
               <Link to="/students" className="btn-primary inline-flex items-center gap-2 mt-4">
                 <Plus className="w-4 h-4" /> Tambah Murid Pertama
               </Link>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map((murid) => (
-              <StudentCard key={murid.id} murid={murid} lastTest={lastTests[murid.id]} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {students.map((murid) => (
+                <StudentCard key={murid.id} murid={murid} lastTest={lastTests[murid.id]} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
+              <p className="text-xs text-islamic-500">
+                Menampilkan {from}–{to} dari {totalCount} murid
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  id="dashboard-prev-page-btn"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Halaman sebelumnya"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm text-islamic-300 px-2">
+                  Halaman {page} dari {totalPages}
+                </span>
+                <button
+                  id="dashboard-next-page-btn"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Halaman berikutnya"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

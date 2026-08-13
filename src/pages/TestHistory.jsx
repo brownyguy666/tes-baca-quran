@@ -96,10 +96,8 @@ function HistoryItem({ tes, murid, onDownload, downloadingId }) {
         </p>
       )}
 
-      {/* Hidden template for this specific test (for PDF) */}
-      <div style={{ display: 'none' }}>
-        <CertificateTemplate result={{ ...tes, murid }} id={`cert-tmpl-${tes.id}`} />
-      </div>
+      {/* Hidden certificate template for PDF capture (positioned off-screen by the component itself) */}
+      <CertificateTemplate result={{ ...tes, murid }} id={`cert-tmpl-${tes.id}`} />
     </div>
   )
 }

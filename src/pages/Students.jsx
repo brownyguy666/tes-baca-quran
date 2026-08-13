@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { Plus, Edit2, Trash2, X, Loader2, Users, Search, Save } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Loader2, Users, Search, Save, ChevronLeft, ChevronRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const EMPTY_FORM = { nama: '', kelas: '', nisn: '' }
+const PAGE_SIZE = 20
 
 function Modal({ title, onClose, children }) {
   return (
@@ -118,9 +119,15 @@ function DeleteConfirmModal({ student, onConfirm, onCancel, loading }) {
 }
 
 export default function Students() {
-  const [students, setStudents] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [search, setSearch]     = useState('')
+  const [students, setStudents]         = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [search, setSearch]             = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  // Pagination
+  const [page, setPage]           = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
   // Modal states
   const [showAdd, setShowAdd]           = useState(false)
@@ -129,13 +136,41 @@ export default function Students() {
   const [formLoading, setFormLoading]   = useState(false)
   const [form, setForm]                 = useState(EMPTY_FORM)
 
-  useEffect(() => { fetchStudents() }, [])
+  // Debounce search input → debouncedSearch (350ms)
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 350)
+    return () => clearTimeout(t)
+  }, [search])
 
-  const fetchStudents = async () => {
+  // Reset ke halaman 1 setiap kali kata kunci pencarian berubah
+  useEffect(() => { setPage(1) }, [debouncedSearch])
+
+  // Fetch ulang setiap kali halaman atau kata kunci (yang sudah di-debounce) berubah
+  useEffect(() => { fetchStudents(page, debouncedSearch) }, [page, debouncedSearch])
+
+  // Query murid dari server dengan pagination (.range) + pencarian (.ilike di server,
+  // bukan filter array di client) supaya cuma PAGE_SIZE baris yang ditarik per request,
+  // berapa pun total murid yang terdaftar.
+  const fetchStudents = async (targetPage, term) => {
     setLoading(true)
-    const { data, error } = await supabase.from('murid').select('*').order('nama')
-    if (error) toast.error('Gagal memuat data murid')
-    else setStudents(data || [])
+    const from = (targetPage - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
+    let query = supabase.from('murid').select('*', { count: 'exact' }).order('nama')
+
+    const t = term.trim()
+    if (t) {
+      query = query.or(`nama.ilike.%${t}%,kelas.ilike.%${t}%,nisn.ilike.%${t}%`)
+    }
+
+    const { data, error, count } = await query.range(from, to)
+
+    if (error) {
+      toast.error('Gagal memuat data murid')
+    } else {
+      setStudents(data || [])
+      setTotalCount(count || 0)
+    }
     setLoading(false)
   }
 
@@ -154,7 +189,11 @@ export default function Students() {
     } else {
       toast.success(`Murid "${form.nama}" berhasil ditambahkan`)
       closeAll()
-      fetchStudents()
+      // Murid baru bisa jatuh di halaman berapa saja secara alfabetis,
+      // jadi paling aman balik ke halaman 1 dan bersihkan pencarian.
+      setSearch('')
+      if (page === 1 && debouncedSearch === '') fetchStudents(1, '')
+      else setPage(1)
     }
   }
 
@@ -169,7 +208,7 @@ export default function Students() {
     } else {
       toast.success('Data murid diperbarui')
       closeAll()
-      fetchStudents()
+      fetchStudents(page, debouncedSearch)
     }
   }
 
@@ -177,19 +216,20 @@ export default function Students() {
     setFormLoading(true)
     const { error } = await supabase.from('murid').delete().eq('id', deleteTarget.id)
     setFormLoading(false)
-    if (error) toast.error('Gagal menghapus murid')
-    else {
+    if (error) {
+      toast.error('Gagal menghapus murid')
+    } else {
       toast.success(`Murid "${deleteTarget.nama}" dihapus`)
       closeAll()
-      fetchStudents()
+      // Kalau murid yang dihapus itu satu-satunya di halaman ini (dan bukan
+      // halaman pertama), mundur satu halaman biar gak nampilin halaman kosong.
+      if (students.length === 1 && page > 1) setPage(page - 1)
+      else fetchStudents(page, debouncedSearch)
     }
   }
 
-  const filtered = students.filter((s) =>
-    s.nama.toLowerCase().includes(search.toLowerCase()) ||
-    (s.kelas || '').toLowerCase().includes(search.toLowerCase()) ||
-    (s.nisn || '').includes(search)
-  )
+  const from = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const to = Math.min(page * PAGE_SIZE, totalCount)
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -201,7 +241,7 @@ export default function Students() {
             Data Murid
           </h1>
           <p className="text-sm text-islamic-400 mt-1">
-            {students.length} murid terdaftar
+            {totalCount} murid terdaftar
           </p>
         </div>
         <button
@@ -233,13 +273,13 @@ export default function Students() {
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-7 h-7 text-islamic-500 animate-spin" />
           </div>
-        ) : filtered.length === 0 ? (
+        ) : students.length === 0 ? (
           <div className="py-16 text-center">
             <Users className="w-10 h-10 text-islamic-700 mx-auto mb-3" />
             <p className="text-islamic-500">
-              {search ? 'Tidak ada murid yang cocok' : 'Belum ada murid terdaftar'}
+              {debouncedSearch ? 'Tidak ada murid yang cocok' : 'Belum ada murid terdaftar'}
             </p>
-            {!search && (
+            {!debouncedSearch && (
               <button onClick={openAdd} className="btn-primary mt-4 inline-flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Tambah Murid Pertama
               </button>
@@ -258,9 +298,9 @@ export default function Students() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-islamic-800/40">
-                {filtered.map((s, i) => (
+                {students.map((s, i) => (
                   <tr key={s.id} id={`student-row-${s.id}`} className="hover:bg-islamic-800/30 transition-colors">
-                    <td className="px-5 py-3.5 text-islamic-500">{i + 1}</td>
+                    <td className="px-5 py-3.5 text-islamic-500">{(page - 1) * PAGE_SIZE + i + 1}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-islamic-600 to-islamic-800
@@ -301,6 +341,38 @@ export default function Students() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && totalCount > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-xs text-islamic-500">
+            Menampilkan {from}–{to} dari {totalCount} murid
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              id="students-prev-page-btn"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Halaman sebelumnya"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-sm text-islamic-300 px-2">
+              Halaman {page} dari {totalPages}
+            </span>
+            <button
+              id="students-next-page-btn"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Halaman berikutnya"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add Modal */}
       {showAdd && (
