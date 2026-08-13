@@ -21,8 +21,8 @@ html, body, #root {
 
 body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  background-color: #0a2e1a;
-  color: #f0fdf4;
+  background-color: #071c17;
+  color: #eaf5ef;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -33,14 +33,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a2e1a;
+  background: #071c17;
 }
 ::-webkit-scrollbar-thumb {
-  background: #16a34a;
+  background: #1f6753;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22c55e;
+  background: #2c7d66;
 }
 
 /* ── Glass Card Utility ───────────────────────────────────── */
@@ -57,6 +57,23 @@ body {
   .card-hover {
     @apply hover:bg-islamic-800/70 hover:border-islamic-600/60 hover:shadow-glow-green transition-all duration-300;
   }
+
+  /* Ivory / manuscript-paper surface — used for the focused scoring workspace
+     (Tes Baru) where a bright, high-contrast surface keeps the guru alert
+     during longer sessions of careful listening + grading. */
+  .card-ivory {
+    @apply bg-parchment-50 border border-parchment-200 rounded-2xl shadow-lg shadow-black/30;
+  }
+  .input-field-ivory {
+    @apply w-full px-4 py-3 rounded-xl bg-white border border-parchment-200
+           text-parchment-900 placeholder-parchment-400 focus:outline-none
+           focus:border-gold-500 focus:ring-1 focus:ring-gold-500/40
+           transition-all duration-200 text-sm;
+  }
+  .label-ivory {
+    @apply block text-xs font-semibold text-parchment-600 uppercase tracking-wider mb-1.5;
+  }
+
   .btn-primary {
     @apply px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-islamic-600 to-islamic-500
            text-white shadow-md hover:shadow-glow-green hover:from-islamic-500 hover:to-islamic-400
@@ -74,8 +91,8 @@ body {
            active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-danger {
-    @apply px-5 py-2.5 rounded-xl font-semibold text-sm bg-red-700/80 border border-red-600/50
-           text-red-100 hover:bg-red-600/80 active:scale-95 transition-all duration-200;
+    @apply px-5 py-2.5 rounded-xl font-semibold text-sm bg-garnet-700/80 border border-garnet-500/50
+           text-garnet-100 hover:bg-garnet-600/80 active:scale-95 transition-all duration-200;
   }
   .input-field {
     @apply w-full px-4 py-3 rounded-xl bg-islamic-950/60 border border-islamic-700/50
@@ -102,11 +119,14 @@ body {
 }
 
 /* ── Islamic Pattern Background ──────────────────────────── */
+/* Three subtle jewel-tone washes (emerald, gold, garnet) instead of a single
+   flat green glow — adds depth without ever competing with foreground content. */
 .pattern-bg {
   background-image:
-    radial-gradient(circle at 20% 80%, rgba(22,163,74,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(245,158,11,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(22,163,74,0.04) 0%, transparent 70%);
+    radial-gradient(circle at 15% 15%, rgba(192,143,55,0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 25%, rgba(44,125,102,0.10) 0%, transparent 50%),
+    radial-gradient(circle at 30% 85%, rgba(140,41,65,0.05) 0%, transparent 45%),
+    radial-gradient(circle at 70% 75%, rgba(44,125,102,0.06) 0%, transparent 55%);
 }
 
 /* ── Level color utilities ────────────────────────────────── */
@@ -136,13 +156,19 @@ body {
   @apply h-px bg-gradient-to-r from-transparent via-gold-500/50 to-transparent;
 }
 
+/* Gilded top-edge — a thin brass line across the top of a card, evoking a
+   gold-leafed manuscript edge. Signature motif for the ivory scoring cards. */
+.gilded-edge {
+  @apply border-t-2 border-t-gold-500;
+}
+
 /* ── Custom range input ───────────────────────────────────── */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(to right, #16a34a, #22c55e);
+  background: linear-gradient(to right, #1f6753, #2c7d66);
   outline: none;
   cursor: pointer;
 }
@@ -152,9 +178,9 @@ input[type="range"]::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #f59e0b;
-  border: 2px solid #fbbf24;
-  box-shadow: 0 0 8px rgba(245,158,11,0.5);
+  background: #c08f37;
+  border: 2px solid #d0a143;
+  box-shadow: 0 0 8px rgba(192,143,55,0.5);
   cursor: pointer;
   transition: transform 0.15s;
 }
@@ -164,9 +190,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
-  background: #f59e0b;
-  border: 2px solid #fbbf24;
+  border-radius: 1px;
+  background: #c08f37;
+  border: 2px solid #d0a143;
   cursor: pointer;
 }
 

@@ -4,6 +4,9 @@
 -- Aman dijalankan berkali-kali (pakai CREATE OR REPLACE / IF NOT EXISTS)
 -- ============================================================================
 
+-- 0) Pastikan kolom created_at ada di hasil_tes (kalau belum ada, tambahkan)
+ALTER TABLE hasil_tes ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
 -- 1) VIEW: tes terakhir per murid
 --    Menggantikan pola lama di Dashboard.jsx yang narik SELURUH tabel
 --    hasil_tes lalu di-loop di JS buat cari tes terbaru per murid.
