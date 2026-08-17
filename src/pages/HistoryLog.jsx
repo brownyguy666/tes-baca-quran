@@ -5,6 +5,7 @@ import { LEVELS } from '../utils/scoring'
 import {
   FileText, Search, Filter, Calendar, ArrowLeft,
   ChevronLeft, ChevronRight, Loader2, User, Download,
+  Trash2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -97,6 +98,23 @@ export default function HistoryLog() {
 
   const handleReset = () => {
     setSearch(''); setFilterKelas(''); setFilterDate(''); setPage(1)
+  }
+
+  const handleDelete = async (testId, studentName) => {
+    const confirmDelete = window.confirm(
+      `Apakah Anda yakin ingin menghapus data tes ${studentName || ''}?\n\nTindakan ini tidak dapat dibatalkan.`
+    )
+    if (!confirmDelete) return
+
+    const { error } = await supabase.from('hasil_tes').delete().eq('id', testId)
+    if (error) {
+      toast.error('Gagal menghapus data tes: ' + error.message)
+      return
+    }
+
+    toast.success('Data tes berhasil dihapus! 🗑️')
+    setTests((prev) => prev.filter((t) => t.id !== testId))
+    setTotal((prev) => Math.max(0, prev - 1))
   }
 
   return (
@@ -248,13 +266,23 @@ export default function HistoryLog() {
                         <LevelBadge level={t.level} />
                       </td>
                       <td className="px-4 py-3">
-                        <Link
-                          to={`/test/result/${t.id}`}
-                          className="btn-secondary text-xs py-1.5 px-3"
-                          id={`view-log-${t.id}`}
-                        >
-                          Detail
-                        </Link>
+                        <div className="flex items-center gap-1.5">
+                          <Link
+                            to={`/test/result/${t.id}`}
+                            className="btn-secondary text-xs py-1.5 px-3"
+                            id={`view-log-${t.id}`}
+                          >
+                            Detail
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(t.id, t.murid?.nama)}
+                            className="p-1.5 rounded-xl text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 border border-rose-500/30 transition-colors"
+                            title="Hapus data tes ini"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

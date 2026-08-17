@@ -6,7 +6,7 @@ import { generateCertificatePDF } from '../utils/pdfGenerator'
 import CertificateTemplate from '../components/CertificateTemplate'
 import {
   ArrowLeft, Download, Calendar, BookOpen, ClipboardList,
-  Loader2, TrendingUp, Star, Plus,
+  Loader2, TrendingUp, Star, Plus, Trash2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -26,8 +26,7 @@ function LevelBadge({ level }) {
   )
 }
 
-function HistoryItem({ tes, murid, onDownload, downloadingId }) {
-  const isDownloading = downloadingId === tes.id
+function HistoryItem({ tes, murid, onDownload, onDelete, isDownloading }) {
   return (
     <div
       id={`history-item-${tes.id}`}
@@ -78,6 +77,14 @@ function HistoryItem({ tes, murid, onDownload, downloadingId }) {
               ? <Loader2 className="w-3 h-3 animate-spin" />
               : <Download className="w-3 h-3" />}
             PDF
+          </button>
+          <button
+            id={`delete-test-${tes.id}`}
+            onClick={() => onDelete(tes.id)}
+            className="p-1.5 rounded-xl text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 border border-rose-500/30 transition-colors"
+            title="Hapus hasil tes ini"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -144,10 +151,26 @@ export default function TestHistory() {
       toast.success('Sertifikat berhasil diunduh!')
     } catch (err) {
       console.error(err)
-      toast.error('Gagal generate PDF')
+      toast.error('Gagal generate PDF: ' + err.message)
     } finally {
       setDownloadingId(null)
     }
+  }
+
+  const handleDelete = async (testId) => {
+    const confirmDelete = window.confirm(
+      'Apakah Anda yakin ingin menghapus rekam hasil tes ini?\n\nTindakan ini tidak dapat dibatalkan.'
+    )
+    if (!confirmDelete) return
+
+    const { error } = await supabase.from('hasil_tes').delete().eq('id', testId)
+    if (error) {
+      toast.error('Gagal menghapus tes: ' + error.message)
+      return
+    }
+
+    toast.success('Hasil tes berhasil dihapus! 🗑️')
+    setTests((prev) => prev.filter((t) => t.id !== testId))
   }
 
   const avgScore = tests.length
@@ -265,7 +288,8 @@ export default function TestHistory() {
               tes={tes}
               murid={murid}
               onDownload={handleDownload}
-              downloadingId={downloadingId}
+              onDelete={handleDelete}
+              isDownloading={downloadingId === tes.id}
             />
           ))
         )}

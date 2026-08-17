@@ -265,8 +265,8 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           {result.ayat_dibaca && (
             <div style={{
               background: 'rgba(201,162,39,0.08)', border: '1px solid rgba(201,162,39,0.25)',
-              borderRadius: '8px', padding: '8px 16px', marginBottom: '10px',
-              textAlign: 'center', maxWidth: '460px',
+              borderRadius: '8px', padding: '6px 16px', marginBottom: '8px',
+              textAlign: 'center', maxWidth: '460px', width: '100%',
             }}>
               <p style={{ fontSize: '9px', color: '#92400e', margin: '0 0 2px 0', fontWeight: 600, textTransform: 'uppercase' }}>
                 Ayat / Surat yang Dibaca
@@ -277,9 +277,44 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             </div>
           )}
 
+          {/* Catatan & Rekomendasi Guru */}
+          <div style={{
+            background: 'rgba(22,163,74,0.05)',
+            border: '1px solid rgba(22,163,74,0.25)',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            marginBottom: '8px',
+            textAlign: 'center',
+            maxWidth: '460px',
+            width: '100%',
+          }}>
+            <p style={{
+              fontSize: '9px',
+              color: '#15803d',
+              margin: '0 0 3px 0',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}>
+              Catatan &amp; Bimbingan Evaluasi Guru:
+            </p>
+            <p style={{
+              fontSize: '11px',
+              color: '#1e293b',
+              margin: 0,
+              fontStyle: 'italic',
+              fontWeight: 600,
+              lineHeight: 1.45,
+            }}>
+              {result.catatan
+                ? `"${result.catatan}"`
+                : '"Pertahankan kualitas bacaan dan terus tingkatkan kecintaan tilawah Al-Qur\'an secara istiqomah."'}
+            </p>
+          </div>
+
           {/* Closing text */}
-          <p style={{ fontSize: '10px', color: '#6b7280', textAlign: 'center', margin: '4px 0 0 0', lineHeight: 1.6 }}>
-            Telah menyelesaikan tes kemampuan membaca Al-Qur'an dengan hasil sebagaimana tertera.
+          <p style={{ fontSize: '9.5px', color: '#6b7280', textAlign: 'center', margin: '2px 0 0 0', lineHeight: 1.5 }}>
+            Telah menyelesaikan tes kemampuan membaca Al-Qur'an dengan hasil sebagaimana tertera di atas.
           </p>
         </div>
 
