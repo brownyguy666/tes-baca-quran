@@ -1,11 +1,11 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { CRITERIA, getSummary, buildTestRecord, LEVELS } from '../utils/scoring'
 import {
   ClipboardList, ChevronDown, ChevronUp, Save, Loader2,
-  Info, AlertCircle, CheckCircle, User, Check,
+  Info, AlertCircle, CheckCircle, User, Check, GraduationCap,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -357,6 +357,8 @@ export default function NewTest() {
   const { profile }    = useAuth()
 
   const [students, setStudents]     = useState([])
+  const [classes, setClasses]       = useState([])
+  const [selectedKelas, setSelectedKelas] = useState('')
   const [selectedId, setSelectedId] = useState(searchParams.get('murid') || '')
   const [loading, setLoading]       = useState(false)
   const [saving, setSaving]         = useState(false)
@@ -374,9 +376,27 @@ export default function NewTest() {
   const fetchStudents = async () => {
     setLoading(true)
     const { data } = await supabase.from('murid').select('*').order('nama')
-    setStudents(data || [])
+    const rows = data || []
+    setStudents(rows)
+    // Derive distinct sorted classes
+    const uniqueKelas = [...new Set(rows.map((m) => m.kelas).filter(Boolean))].sort(
+      (a, b) => a.localeCompare(b, 'id', { numeric: true })
+    )
+    setClasses(uniqueKelas)
+
+    // If a murid was pre-selected via query param, auto-set kelas
+    const preId = searchParams.get('murid')
+    if (preId) {
+      const pre = rows.find((m) => m.id === preId)
+      if (pre?.kelas) setSelectedKelas(pre.kelas)
+    }
     setLoading(false)
   }
+
+  // Students filtered by selected class
+  const filteredStudents = selectedKelas
+    ? students.filter((s) => s.kelas === selectedKelas)
+    : students
 
   const selectedStudent = students.find((s) => s.id === selectedId)
 
@@ -396,7 +416,7 @@ export default function NewTest() {
   }, [scores])
 
   // Determine current step
-  const currentStep = !selectedId ? 1 : !extras.ayat_dibaca ? 2 : 3
+  const currentStep = !selectedKelas ? 1 : !selectedId ? 1 : !extras.ayat_dibaca ? 2 : 3
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -436,7 +456,7 @@ export default function NewTest() {
       <StepBar current={currentStep} />
 
       <form onSubmit={handleSave} className="space-y-6" id="new-test-form">
-        {/* Step 1 — Pilih Murid */}
+        {/* Step 1 — Pilih Kelas & Murid */}
         <div className="card p-5 space-y-4 animate-in">
           <h2 className="font-semibold flex items-center gap-2" style={{ color: '#cbd5e1' }}>
             <span
@@ -451,26 +471,74 @@ export default function NewTest() {
             >
               {selectedId ? <Check className="w-3 h-3" /> : '1'}
             </span>
-            Pilih Murid
+            Pilih Kelas &amp; Murid
           </h2>
 
+          {/* ── Pilih Kelas ── */}
           <div>
-            <label className="label" htmlFor="select-murid">Nama Murid *</label>
-            <select
-              id="select-murid"
-              className="input-field"
-              value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
-              required
-            >
-              <option value="">-- Pilih murid --</option>
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.nama} — Kelas {s.kelas}
-                </option>
-              ))}
-            </select>
+            <label className="label" htmlFor="select-kelas">Kelas *</label>
+            {loading ? (
+              <div className="input-field flex items-center gap-2" style={{ color: '#475569' }}>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Memuat data…</span>
+              </div>
+            ) : (
+              <select
+                id="select-kelas"
+                className="input-field"
+                value={selectedKelas}
+                onChange={(e) => {
+                  setSelectedKelas(e.target.value)
+                  setSelectedId('') // reset murid saat ganti kelas
+                }}
+                required
+              >
+                <option value="">-- Pilih kelas --</option>
+                {classes.map((k) => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+              </select>
+            )}
           </div>
+
+          {/* Kelas badge indicator */}
+          {selectedKelas && (
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm animate-in"
+              style={{
+                background: 'rgba(99,102,241,0.08)',
+                border: '1px solid rgba(99,102,241,0.18)',
+              }}
+            >
+              <GraduationCap className="w-4 h-4" style={{ color: '#818cf8' }} />
+              <span style={{ color: '#94a3b8' }}>Kelas</span>
+              <span className="font-bold" style={{ color: '#c7d2fe' }}>{selectedKelas}</span>
+              <span className="ml-auto text-xs" style={{ color: '#475569' }}>
+                {filteredStudents.length} murid
+              </span>
+            </div>
+          )}
+
+          {/* ── Pilih Murid (muncul setelah kelas dipilih) ── */}
+          {selectedKelas && (
+            <div className="animate-in">
+              <label className="label" htmlFor="select-murid">Nama Murid *</label>
+              <select
+                id="select-murid"
+                className="input-field"
+                value={selectedId}
+                onChange={(e) => setSelectedId(e.target.value)}
+                required
+              >
+                <option value="">-- Pilih murid di kelas {selectedKelas} --</option>
+                {filteredStudents.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nama}{s.nisn ? ` (NISN: ${s.nisn})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {selectedStudent && (
             <div
