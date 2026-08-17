@@ -11,18 +11,17 @@ import {
 import toast from 'react-hot-toast'
 
 function LevelBadge({ level }) {
-  const colorMap = {
-    'Mumtaz (Tartil)': 'bg-amber-900/50 text-amber-300 border-amber-700',
-    'Mahir':           'bg-green-900/50 text-green-300 border-green-700',
-    'Menengah':        'bg-orange-900/40 text-orange-300 border-orange-700',
-    'Dasar':           'bg-blue-900/40 text-blue-300 border-blue-700',
-    'Pemula':          'bg-gray-800/60 text-gray-300 border-gray-700',
+  const styleMap = {
+    'Mumtaz (Tartil)': 'level-mumtaz',
+    'Mahir':           'level-mahir',
+    'Menengah':        'level-menengah',
+    'Dasar':           'level-dasar',
+    'Pemula':          'level-pemula',
   }
   const l = LEVELS.find((x) => x.label === level)
-  const cls = colorMap[level] || colorMap['Pemula']
   return (
-    <span className={`badge-level border ${cls}`}>
-      {l?.emoji} {level || '-'}
+    <span className={`badge-level ${styleMap[level] || 'level-pemula'}`}>
+      {l?.emoji} {level || '—'}
     </span>
   )
 }
@@ -32,24 +31,32 @@ function HistoryItem({ tes, murid, onDownload, downloadingId }) {
   return (
     <div
       id={`history-item-${tes.id}`}
-      className="card p-5 space-y-4 animate-in hover:border-islamic-600/50 transition-all duration-200"
+      className="card p-5 space-y-4 animate-in transition-all duration-200"
+      style={{ ':hover': { borderColor: 'rgba(212,175,55,0.25)' } }}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <div className="flex items-center gap-3 flex-wrap">
             <LevelBadge level={tes.level} />
-            <span className="text-2xl font-black text-islamic-100">{tes.skor_total}</span>
+            <span className="text-2xl font-black" style={{ color: '#f8fafc' }}>
+              {tes.skor_total}
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-islamic-500">
+          <div className="flex items-center gap-1.5 text-xs" style={{ color: '#475569' }}>
             <Calendar className="w-3 h-3" />
             {new Date(tes.tanggal_tes).toLocaleDateString('id-ID', {
-              weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
+              weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
             })}
           </div>
           {tes.ayat_dibaca && (
-            <div className="flex items-center gap-1.5 text-xs text-islamic-500">
+            <div className="flex items-center gap-1.5 text-xs" style={{ color: '#475569' }}>
               <BookOpen className="w-3 h-3" />
               <span className="italic">{tes.ayat_dibaca}</span>
+            </div>
+          )}
+          {tes.guru_penguji && (
+            <div className="text-xs" style={{ color: '#334155' }}>
+              Penguji: {tes.guru_penguji}
             </div>
           )}
         </div>
@@ -69,44 +76,50 @@ function HistoryItem({ tes, murid, onDownload, downloadingId }) {
           >
             {isDownloading
               ? <Loader2 className="w-3 h-3 animate-spin" />
-              : <Download className="w-3 h-3" />
-            }
+              : <Download className="w-3 h-3" />}
             PDF
           </button>
         </div>
       </div>
 
-      {/* Score breakdown mini */}
+      {/* Score breakdown */}
       <div className="grid grid-cols-3 gap-2">
         {[
-          { label: 'Makhraj',    score: tes.skor_makhraj },
-          { label: 'Tajwid',    score: tes.skor_tajwid },
-          { label: 'Kelancaran', score: tes.skor_kelancaran },
-        ].map(({ label, score }) => (
-          <div key={label} className="bg-islamic-900/40 rounded-xl p-2.5 text-center">
-            <p className="text-[10px] text-islamic-500 font-medium">{label}</p>
-            <p className="text-base font-bold text-islamic-200 mt-0.5">{score}</p>
+          { label: 'Makhraj',    score: tes.skor_makhraj,    color: '#818cf8' },
+          { label: 'Tajwid',    score: tes.skor_tajwid,     color: '#d4af37' },
+          { label: 'Kelancaran', score: tes.skor_kelancaran, color: '#34d399' },
+        ].map(({ label, score, color }) => (
+          <div
+            key={label}
+            className="rounded-xl p-2.5 text-center"
+            style={{
+              background: 'rgba(11,15,25,0.5)',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            <p className="text-[10px] font-medium mb-0.5" style={{ color: '#475569' }}>{label}</p>
+            <p className="text-base font-black" style={{ color }}>{score}</p>
           </div>
         ))}
       </div>
 
       {tes.catatan && (
-        <p className="text-xs text-islamic-500 italic border-t border-islamic-800/40 pt-2">
+        <p className="text-xs italic pt-2"
+           style={{ color: '#475569', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           📝 {tes.catatan}
         </p>
       )}
 
-      {/* Hidden certificate template for PDF capture (positioned off-screen by the component itself) */}
       <CertificateTemplate result={{ ...tes, murid }} id={`cert-tmpl-${tes.id}`} />
     </div>
   )
 }
 
 export default function TestHistory() {
-  const { id: muridId }   = useParams()
-  const [murid, setMurid] = useState(null)
-  const [tests, setTests] = useState([])
-  const [loading, setLoading]       = useState(true)
+  const { id: muridId }              = useParams()
+  const [murid, setMurid]            = useState(null)
+  const [tests, setTests]            = useState([])
+  const [loading, setLoading]        = useState(true)
   const [downloadingId, setDownloadingId] = useState(null)
 
   useEffect(() => { fetchData() }, [muridId])
@@ -115,7 +128,8 @@ export default function TestHistory() {
     setLoading(true)
     const [{ data: muridData }, { data: tesData }] = await Promise.all([
       supabase.from('murid').select('*').eq('id', muridId).single(),
-      supabase.from('hasil_tes').select('*').eq('murid_id', muridId).order('tanggal_tes', { ascending: false }),
+      supabase.from('hasil_tes').select('*').eq('murid_id', muridId)
+               .order('tanggal_tes', { ascending: false }),
     ])
     setMurid(muridData)
     setTests(tesData || [])
@@ -136,16 +150,17 @@ export default function TestHistory() {
     }
   }
 
-  // Simple stats
   const avgScore = tests.length
     ? (tests.reduce((s, t) => s + (t.skor_total || 0), 0) / tests.length).toFixed(1)
-    : '-'
-  const bestTest = tests.reduce((best, t) => (!best || t.skor_total > best.skor_total) ? t : best, null)
+    : '—'
+  const bestTest = tests.reduce(
+    (best, t) => (!best || t.skor_total > best.skor_total) ? t : best, null
+  )
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <Loader2 className="w-8 h-8 text-islamic-500 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#334155' }} />
       </div>
     )
   }
@@ -153,7 +168,7 @@ export default function TestHistory() {
   if (!murid) {
     return (
       <div className="text-center py-20">
-        <p className="text-islamic-400">Murid tidak ditemukan</p>
+        <p style={{ color: '#475569' }}>Murid tidak ditemukan</p>
         <Link to="/students" className="btn-secondary mt-4 inline-flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Kembali
         </Link>
@@ -163,50 +178,59 @@ export default function TestHistory() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Back */}
       <Link
         to="/dashboard"
-        className="inline-flex items-center gap-1.5 text-sm text-islamic-400 hover:text-islamic-200 transition-colors animate-in"
+        className="inline-flex items-center gap-1.5 text-sm transition-colors animate-in"
+        style={{ color: '#475569' }}
         id="back-to-dashboard-btn"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Dashboard
+        <ArrowLeft className="w-4 h-4" /> Dashboard
       </Link>
 
       {/* Student header */}
       <div className="card p-6 animate-in">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-islamic-600 to-islamic-800
-                          flex items-center justify-center text-xl font-black text-gold-300 shadow-glow-green">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg,#6366f1,#4338ca)',
+              color: '#fff',
+            }}
+          >
             {murid.nama.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-bold font-display text-islamic-50">{murid.nama}</h1>
-            <p className="text-sm text-islamic-400">Kelas {murid.kelas} · NISN {murid.nisn || '-'}</p>
+            <h1 className="text-xl font-bold font-display" style={{ color: '#f8fafc' }}>
+              {murid.nama}
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: '#475569' }}>
+              Kelas {murid.kelas} · NISN {murid.nisn || '—'}
+            </p>
           </div>
           <Link
             to={`/test/new?murid=${murid.id}`}
             id="new-test-for-student-btn"
-            className="btn-primary flex items-center gap-2 text-sm"
+            className="btn-gold flex items-center gap-2 text-sm"
           >
             <Plus className="w-4 h-4" /> Tes Baru
           </Link>
         </div>
 
         {tests.length > 0 && (
-          <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-islamic-800/40">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-islamic-100">{tests.length}</p>
-              <p className="text-xs text-islamic-500 mt-0.5">Total Tes</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-islamic-100">{avgScore}</p>
-              <p className="text-xs text-islamic-500 mt-0.5">Rata-rata</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-islamic-100">{bestTest?.skor_total || '-'}</p>
-              <p className="text-xs text-islamic-500 mt-0.5">Skor Terbaik</p>
-            </div>
+          <div
+            className="grid grid-cols-3 gap-3 mt-5 pt-5"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            {[
+              { label: 'Total Tes', value: tests.length, color: '#818cf8' },
+              { label: 'Rata-rata', value: avgScore, color: '#d4af37' },
+              { label: 'Skor Terbaik', value: bestTest?.skor_total || '—', color: '#34d399' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="text-center">
+                <p className="text-2xl font-black" style={{ color }}>{value}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#475569' }}>{label}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -214,15 +238,19 @@ export default function TestHistory() {
       {/* History list */}
       <div className="space-y-4">
         <h2 className="section-title flex items-center gap-2">
-          <ClipboardList className="w-5 h-5 text-gold-400" />
+          <ClipboardList className="w-5 h-5" style={{ color: '#d4af37' }} />
           Riwayat Tes
         </h2>
 
         {tests.length === 0 ? (
           <div className="card p-12 text-center">
-            <TrendingUp className="w-10 h-10 text-islamic-700 mx-auto mb-3" />
-            <p className="text-islamic-400 font-medium">Belum ada riwayat tes</p>
-            <p className="text-sm text-islamic-600 mt-1">Mulai tes pertama untuk murid ini</p>
+            <TrendingUp className="w-10 h-10 mx-auto mb-3" style={{ color: '#1e293b' }} />
+            <p className="font-medium" style={{ color: '#475569' }}>
+              Belum ada riwayat tes
+            </p>
+            <p className="text-sm mt-1" style={{ color: '#334155' }}>
+              Mulai tes pertama untuk murid ini
+            </p>
             <Link
               to={`/test/new?murid=${murid.id}`}
               className="btn-primary mt-4 inline-flex items-center gap-2"

@@ -1,96 +1,155 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../contexts/AuthContext'
 import { LEVELS } from '../utils/scoring'
 import {
   Users, ClipboardList, TrendingUp, Plus, Search,
-  ChevronRight, ChevronLeft, Calendar, Star, BookOpen, Loader2,
+  ChevronRight, ChevronLeft, Calendar, BookOpen, Loader2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const PAGE_SIZE = 24
 
-function StatCard({ icon: Icon, label, value, sub, color = 'islamic' }) {
-  const colors = {
-    islamic: 'from-islamic-700/50 to-islamic-900/50 border-islamic-600/40 text-islamic-300',
-    gold:    'from-gold-800/30 to-gold-900/40 border-gold-600/30 text-gold-300',
-    blue:    'from-blue-900/40 to-blue-950/50 border-blue-700/30 text-blue-300',
-  }
+// ── Avatar colour pool (deterministic by student id) ──────
+const AVATAR_GRADIENTS = [
+  'linear-gradient(135deg,#6366f1,#4338ca)',
+  'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+  'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+  'linear-gradient(135deg,#06b6d4,#0e7490)',
+  'linear-gradient(135deg,#10b981,#047857)',
+  'linear-gradient(135deg,#f59e0b,#b45309)',
+  'linear-gradient(135deg,#ec4899,#be185d)',
+  'linear-gradient(135deg,#14b8a6,#0f766e)',
+]
+function avatarGradient(id = '') {
+  const h = [...id].reduce((a, c) => a + c.charCodeAt(0), 0)
+  return AVATAR_GRADIENTS[h % AVATAR_GRADIENTS.length]
+}
+
+// ── KPI Card ──────────────────────────────────────────────
+const KPI_VARIANTS = {
+  indigo:  {
+    cls: 'kpi-indigo',
+    iconBg: 'rgba(99,102,241,0.18)',
+    iconColor: '#818cf8',
+    valueCls: 'text-indigo-300',
+    glow: 'rgba(99,102,241,0.15)',
+  },
+  blue: {
+    cls: 'kpi-blue',
+    iconBg: 'rgba(59,130,246,0.18)',
+    iconColor: '#60a5fa',
+    valueCls: 'text-blue-300',
+    glow: 'rgba(59,130,246,0.15)',
+  },
+  gold: {
+    cls: 'kpi-gold',
+    iconBg: 'rgba(212,175,55,0.18)',
+    iconColor: '#d4af37',
+    valueCls: 'text-yellow-300',
+    glow: 'rgba(212,175,55,0.15)',
+  },
+}
+
+function KpiCard({ icon: Icon, label, value, sub, variant = 'indigo' }) {
+  const v = KPI_VARIANTS[variant]
   return (
-    <div className={`card p-5 bg-gradient-to-br ${colors[color]} animate-in`}>
-      <div className="flex items-start justify-between">
+    <div className={`kpi-card ${v.cls} animate-in`}>
+      {/* Ambient glow blob */}
+      <div
+        className="absolute top-0 right-0 w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: v.glow, filter: 'blur(28px)', transform: 'translate(30%,-30%)' }}
+      />
+      <div className="relative flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-islamic-50">{value}</p>
-          {sub && <p className="text-xs opacity-60 mt-1">{sub}</p>}
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-2"
+             style={{ color: '#475569' }}>
+            {label}
+          </p>
+          <p className={`text-4xl font-black ${v.valueCls}`}>{value ?? '—'}</p>
+          {sub && <p className="text-xs mt-1.5" style={{ color: '#475569' }}>{sub}</p>}
         </div>
-        <div className="p-3 rounded-xl bg-white/10">
-          <Icon className="w-5 h-5" />
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+          style={{ background: v.iconBg }}
+        >
+          <Icon className="w-5 h-5" style={{ color: v.iconColor }} />
         </div>
       </div>
     </div>
   )
 }
 
+// ── Level Badge ───────────────────────────────────────────
 function LevelBadge({ level }) {
   const l = LEVELS.find((x) => x.label === level)
-  const colorMap = {
-    'Mumtaz (Tartil)': 'bg-amber-900/50 text-amber-300 border-amber-700',
-    'Mahir':           'bg-green-900/50 text-green-300 border-green-700',
-    'Menengah':        'bg-orange-900/40 text-orange-300 border-orange-700',
-    'Dasar':           'bg-blue-900/40 text-blue-300 border-blue-700',
-    'Pemula':          'bg-gray-800/60 text-gray-300 border-gray-700',
+  const styleMap = {
+    'Mumtaz (Tartil)': 'level-mumtaz',
+    'Mahir':           'level-mahir',
+    'Menengah':        'level-menengah',
+    'Dasar':           'level-dasar',
+    'Pemula':          'level-pemula',
   }
-  const cls = colorMap[level] || 'bg-gray-800/60 text-gray-300 border-gray-700'
   return (
-    <span className={`badge-level border ${cls}`}>
+    <span className={`badge-level ${styleMap[level] || 'level-pemula'}`}>
       <span>{l?.emoji || '📚'}</span>
-      <span>{level || '-'}</span>
+      <span>{level || '—'}</span>
     </span>
   )
 }
 
+// ── Student Card ──────────────────────────────────────────
 function StudentCard({ murid, lastTest }) {
   const navigate = useNavigate()
+  const grad = avatarGradient(murid.id)
+
   return (
     <div
-      className="card card-hover cursor-pointer p-5 flex flex-col gap-3 animate-in"
+      className="card card-hover p-5 flex flex-col gap-3 animate-in"
       onClick={() => navigate(`/students/${murid.id}/history`)}
       id={`student-card-${murid.id}`}
     >
       {/* Avatar + name */}
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-islamic-600 to-islamic-800
-                        flex items-center justify-center flex-shrink-0 text-base font-bold text-gold-300">
+        <div
+          className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0
+                     text-base font-bold text-white"
+          style={{ background: grad }}
+        >
           {murid.nama.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-islamic-100 truncate">{murid.nama}</p>
-          <p className="text-xs text-islamic-400">Kelas {murid.kelas} · NISN {murid.nisn || '-'}</p>
+          <p className="font-semibold truncate" style={{ color: '#e2e8f0' }}>{murid.nama}</p>
+          <p className="text-xs mt-0.5" style={{ color: '#475569' }}>
+            Kelas {murid.kelas} · NISN {murid.nisn || '—'}
+          </p>
         </div>
-        <ChevronRight className="w-4 h-4 text-islamic-600 flex-shrink-0 mt-1" />
+        <ChevronRight className="w-4 h-4 flex-shrink-0 mt-1" style={{ color: '#334155' }} />
       </div>
 
-      {/* Last test info */}
+      {/* Last test */}
       {lastTest ? (
-        <div className="bg-islamic-950/40 rounded-xl p-3 space-y-2">
+        <div className="rounded-xl p-3 space-y-2"
+             style={{ background: 'rgba(11,15,25,0.5)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center justify-between">
             <LevelBadge level={lastTest.level} />
-            <span className="text-xl font-bold text-islamic-100">{lastTest.skor_total}</span>
+            <span className="text-xl font-black" style={{ color: '#f8fafc' }}>
+              {lastTest.skor_total}
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-islamic-500">
+          <div className="flex items-center gap-1.5 text-xs" style={{ color: '#475569' }}>
             <Calendar className="w-3 h-3" />
             <span>
               {new Date(lastTest.tanggal_tes).toLocaleDateString('id-ID', {
-                day: 'numeric', month: 'long', year: 'numeric'
+                day: 'numeric', month: 'short', year: 'numeric',
               })}
             </span>
           </div>
         </div>
       ) : (
-        <div className="bg-islamic-950/30 rounded-xl p-3 text-center">
-          <p className="text-xs text-islamic-600 italic">Belum ada tes</p>
+        <div className="rounded-xl p-3 text-center"
+             style={{ background: 'rgba(11,15,25,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <p className="text-xs italic" style={{ color: '#334155' }}>Belum ada tes</p>
         </div>
       )}
 
@@ -115,149 +174,139 @@ function StudentCard({ murid, lastTest }) {
   )
 }
 
+// ── Dashboard Page ────────────────────────────────────────
 export default function Dashboard() {
-  const { profile } = useAuth()
-  const [students, setStudents]     = useState([])
-  const [lastTests, setLastTests]   = useState({})   // murid_id → latest hasil_tes
-  const [loading, setLoading]       = useState(true)
-  const [search, setSearch]         = useState('')
+  const [students, setStudents]   = useState([])
+  const [lastTests, setLastTests] = useState({})
+  const [loading, setLoading]     = useState(true)
+  const [search, setSearch]       = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [stats, setStats]           = useState({ total: 0, tesHariIni: 0, rataRata: '-' })
-
-  // Pagination
-  const [page, setPage]             = useState(1)
+  const [stats, setStats] = useState({ total: 0, tesHariIni: 0, rataRata: null })
+  const [page, setPage]         = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
-  // Stat kartu di atas dihitung sekali lewat RPC get_dashboard_stats() (COUNT/AVG
-  // di database), bukan dengan menarik seluruh tabel murid & hasil_tes ke client.
   const fetchStats = async () => {
     const { data, error } = await supabase.rpc('get_dashboard_stats')
-    if (error) {
-      toast.error('Gagal memuat statistik dashboard')
-      return
-    }
+    if (error) { toast.error('Gagal memuat statistik'); return }
     const row = Array.isArray(data) ? data[0] : data
     setStats({
-      total: row?.total_murid ?? 0,
+      total:      row?.total_murid ?? 0,
       tesHariIni: row?.tes_hari_ini ?? 0,
-      rataRata: row?.rata_rata_skor != null ? row.rata_rata_skor : '-',
+      rataRata:   row?.rata_rata_skor != null ? Number(row.rata_rata_skor).toFixed(1) : null,
     })
   }
 
-  // Daftar murid ditarik per halaman (.range), dengan pencarian di server
-  // (.ilike) bukan filter array di client. Tes terakhir hanya diambil untuk
-  // murid yang sedang tampil di halaman ini, dari view last_test_per_murid.
   const fetchStudents = async (targetPage, term) => {
     setLoading(true)
     const from = (targetPage - 1) * PAGE_SIZE
-    const to = from + PAGE_SIZE - 1
+    const to   = from + PAGE_SIZE - 1
 
     let query = supabase.from('murid').select('*', { count: 'exact' }).order('nama')
     const t = term.trim()
-    if (t) {
-      query = query.or(`nama.ilike.%${t}%,kelas.ilike.%${t}%,nisn.ilike.%${t}%`)
-    }
+    if (t) query = query.or(`nama.ilike.%${t}%,kelas.ilike.%${t}%,nisn.ilike.%${t}%`)
 
     const { data: muridData, error: muridErr, count } = await query.range(from, to)
-    if (muridErr) {
-      toast.error('Gagal memuat data murid')
-      setLoading(false)
-      return
-    }
+    if (muridErr) { toast.error('Gagal memuat data murid'); setLoading(false); return }
 
     setStudents(muridData || [])
     setTotalCount(count || 0)
 
     const ids = (muridData || []).map((m) => m.id)
     if (ids.length) {
-      const { data: lastTestData, error: testErr } = await supabase
-        .from('last_test_per_murid')
-        .select('*')
-        .in('murid_id', ids)
-      if (testErr) {
-        toast.error('Gagal memuat riwayat tes terakhir')
-      } else {
-        const map = {}
-        for (const tes of (lastTestData || [])) map[tes.murid_id] = tes
-        setLastTests(map)
-      }
+      const { data: lastTestData } = await supabase
+        .from('last_test_per_murid').select('*').in('murid_id', ids)
+      const map = {}
+      for (const tes of (lastTestData || [])) map[tes.murid_id] = tes
+      setLastTests(map)
     } else {
       setLastTests({})
     }
-
     setLoading(false)
   }
 
   useEffect(() => { fetchStats() }, [])
-
-  // Debounce input pencarian (350ms) supaya gak nembak query di tiap ketikan
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350)
     return () => clearTimeout(t)
   }, [search])
-
-  // Reset ke halaman 1 tiap kali kata kunci berubah
   useEffect(() => { setPage(1) }, [debouncedSearch])
-
   useEffect(() => { fetchStudents(page, debouncedSearch) }, [page, debouncedSearch])
 
-  const hour = new Date().getHours()
-  const greeting = hour < 11 ? 'Selamat Pagi' : hour < 15 ? 'Selamat Siang' : 'Selamat Sore'
-
   const from = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
-  const to = Math.min(page * PAGE_SIZE, totalCount)
+  const to   = Math.min(page * PAGE_SIZE, totalCount)
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="animate-in">
-        <div className="divider-ornament text-[10px] text-gold-600/50 font-arabic mb-2">
-          الحمد لله
+
+      {/* ── Page header ── */}
+      <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="text-[10px] font-arabic mb-1" style={{ color: '#334155' }}>
+            الحمد لله
+          </div>
+          <h1 className="section-title text-2xl flex items-center gap-2">
+            <BookOpen className="w-6 h-6" style={{ color: '#d4af37' }} />
+            Dashboard
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#475569' }}>
+            Pantau aktivitas dan kemajuan penilaian
+          </p>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="section-title text-2xl">
-              {greeting}, {profile?.name} 👋
-            </h1>
-            <p className="text-sm text-islamic-400 mt-1">
-              Sistem Penilaian Baca Al-Quran · SMP Negeri 2 Glagah
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link to="/students" id="manage-students-btn" className="btn-secondary flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Kelola Murid
-            </Link>
-            <Link to="/test/new" id="new-test-btn" className="btn-primary flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Tes Baru
-            </Link>
-          </div>
+        <div className="flex gap-3">
+          <Link to="/students" id="manage-students-btn"
+                className="btn-secondary flex items-center gap-2">
+            <Users className="w-4 h-4" /> Kelola Murid
+          </Link>
+          <Link to="/test/new" id="new-test-btn"
+                className="btn-gold flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Tes Baru
+          </Link>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* ── KPI Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard icon={Users}         label="Total Murid"   value={stats.total}       sub="Terdaftar"           color="islamic" />
-        <StatCard icon={ClipboardList} label="Tes Hari Ini"  value={stats.tesHariIni}  sub="Penilaian dilakukan" color="blue"    />
-        <StatCard icon={TrendingUp}    label="Rata-rata Skor" value={stats.rataRata}   sub="Dari semua tes"      color="gold"    />
+        <KpiCard
+          icon={Users}
+          label="Total Murid"
+          value={stats.total}
+          sub="Murid terdaftar"
+          variant="indigo"
+        />
+        <KpiCard
+          icon={ClipboardList}
+          label="Tes Hari Ini"
+          value={stats.tesHariIni}
+          sub="Penilaian dilakukan"
+          variant="blue"
+        />
+        <KpiCard
+          icon={TrendingUp}
+          label="Rata-rata Skor"
+          value={stats.rataRata ?? '—'}
+          sub="Dari semua tes"
+          variant="gold"
+        />
       </div>
 
-      {/* Search + List */}
+      {/* ── Search + Student Grid ── */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
           <h2 className="section-title flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-gold-400" />
+            <Users className="w-5 h-5" style={{ color: '#d4af37' }} />
             Daftar Murid
           </h2>
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-islamic-500" />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+              style={{ color: '#475569' }}
+            />
             <input
               id="search-students-input"
               type="text"
               placeholder="Cari nama, kelas, NISN…"
-              className="input-field pl-10 py-2"
+              className="input-field pl-10 py-2.5"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -265,21 +314,19 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 text-islamic-500 animate-spin" />
-              <p className="text-sm text-islamic-500">Memuat data murid…</p>
-            </div>
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#334155' }} />
+            <p className="text-sm" style={{ color: '#475569' }}>Memuat data murid…</p>
           </div>
         ) : students.length === 0 ? (
           <div className="card p-12 text-center">
-            <BookOpen className="w-12 h-12 text-islamic-700 mx-auto mb-3" />
-            <p className="text-islamic-400 font-medium">
+            <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: '#334155' }} />
+            <p className="font-medium" style={{ color: '#64748b' }}>
               {debouncedSearch ? 'Murid tidak ditemukan' : 'Belum ada data murid'}
             </p>
             {!debouncedSearch && (
               <Link to="/students" className="btn-primary inline-flex items-center gap-2 mt-4">
-                <Plus className="w-4 h-4" /> Tambah Murid Pertama
+                <Plus className="w-4 h-4" /> Tambah Murid
               </Link>
             )}
           </div>
@@ -293,7 +340,7 @@ export default function Dashboard() {
 
             {/* Pagination */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
-              <p className="text-xs text-islamic-500">
+              <p className="text-xs" style={{ color: '#475569' }}>
                 Menampilkan {from}–{to} dari {totalCount} murid
               </p>
               <div className="flex items-center gap-2">
@@ -301,20 +348,18 @@ export default function Dashboard() {
                   id="dashboard-prev-page-btn"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                  title="Halaman sebelumnya"
+                  className="btn-secondary p-2 disabled:opacity-40"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-sm text-islamic-300 px-2">
-                  Halaman {page} dari {totalPages}
+                <span className="text-sm px-2" style={{ color: '#94a3b8' }}>
+                  {page} / {totalPages}
                 </span>
                 <button
                   id="dashboard-next-page-btn"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="btn-secondary p-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                  title="Halaman berikutnya"
+                  className="btn-secondary p-2 disabled:opacity-40"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

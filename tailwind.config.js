@@ -7,35 +7,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Islamic green palette
+        // ── Midnight Slate palette (replaces old islamic/green) ──
+        // This intentional remapping means ALL existing islamic-* class
+        // references automatically become the new midnight theme.
         islamic: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#0a2e1a',
+          50:  '#f8fafc',  // Off-white / primary text
+          100: '#e2e8f0',  // Text primary
+          200: '#cbd5e1',  // Text
+          300: '#94a3b8',  // Text muted
+          400: '#64748b',  // Text secondary
+          500: '#475569',  // Borders / dividers
+          600: '#334155',  // Card border
+          700: '#1e293b',  // Card bg (Rich Dark Slate)
+          800: '#111827',  // Sidebar bg
+          900: '#0d1117',  // Deep bg
+          950: '#0b0f19',  // Canvas bg (Deep Midnight)
         },
-        // Gold / amber palette
+        // ── Brushed Gold / Warm Amber ──
         gold: {
           50:  '#fffbeb',
           100: '#fef3c7',
           200: '#fde68a',
           300: '#fcd34d',
           400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
+          500: '#f59e0b',  // Warm Amber
+          600: '#d4af37',  // Brushed Gold
+          700: '#a8922a',
+          800: '#8a7320',
+          900: '#6e5c1a',
+          950: '#3d3209',
         },
-        // Garnet / deep red palette
+        // ── Garnet / Deep Red ──
         garnet: {
           50:  '#fff1f2',
           100: '#ffe4e6',
@@ -49,7 +51,7 @@ export default {
           900: '#881337',
           950: '#4c0519',
         },
-        // Cream / parchment
+        // ── Parchment (keep for NewTest ivory cards) ──
         parchment: {
           50:  '#fdf8f0',
           100: '#faefd9',
@@ -64,40 +66,51 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        arabic: ['Amiri', 'serif'],
+        sans:    ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        arabic:  ['Amiri', 'serif'],
         display: ['Playfair Display', 'serif'],
       },
       backgroundImage: {
         'islamic-pattern': "url('/islamic-pattern.svg')",
       },
       boxShadow: {
-        'glow-green': '0 0 20px rgba(22, 163, 74, 0.3)',
-        'glow-gold': '0 0 20px rgba(245, 158, 11, 0.3)',
+        // Legacy (kept so old references don't break)
+        'glow-green':   '0 0 20px rgba(16, 185, 129, 0.3)',
+        // New accent glows
+        'glow-gold':    '0 0 20px rgba(212, 175, 55, 0.4)',
+        'glow-indigo':  '0 0 20px rgba(99, 102, 241, 0.4)',
+        'glow-blue':    '0 0 20px rgba(59, 130, 246, 0.4)',
+        'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.4)',
+        'lux': '0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.4s ease-out',
-        'slide-up': 'slideUp 0.4s ease-out',
+        'fade-in':        'fadeIn 0.4s ease-out',
+        'slide-up':       'slideUp 0.4s ease-out',
         'slide-in-right': 'slideInRight 0.3s ease-out',
-        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
-        'spin-slow': 'spin 3s linear infinite',
+        'pulse-glow':     'pulseGlow 2s ease-in-out infinite',
+        'pulse-gold':     'pulseGold 2.5s ease-in-out infinite',
+        'spin-slow':      'spin 3s linear infinite',
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
+          '0%':   { opacity: '0' },
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '0%':   { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(16px)' },
+          '0%':   { opacity: '0', transform: 'translateX(16px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 10px rgba(22, 163, 74, 0.2)' },
-          '50%': { boxShadow: '0 0 30px rgba(22, 163, 74, 0.5)' },
+          '0%, 100%': { boxShadow: '0 0 10px rgba(99,102,241,0.2)' },
+          '50%':      { boxShadow: '0 0 30px rgba(99,102,241,0.5)' },
+        },
+        pulseGold: {
+          '0%, 100%': { boxShadow: '0 0 12px rgba(212,175,55,0.2)' },
+          '50%':      { boxShadow: '0 0 28px rgba(212,175,55,0.55)' },
         },
       },
     },

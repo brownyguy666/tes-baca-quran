@@ -8,6 +8,10 @@ import Students from './pages/Students'
 import NewTest from './pages/NewTest'
 import TestHistory from './pages/TestHistory'
 import TestResult from './pages/TestResult'
+import HistoryLog from './pages/HistoryLog'
+import Reports from './pages/Reports'
+import Rubric from './pages/Rubric'
+import Settings from './pages/Settings'
 
 function PublicRoute({ children }) {
   const { session, isLoading } = useAuth()
@@ -16,64 +20,36 @@ function PublicRoute({ children }) {
   return children
 }
 
+function Protected({ children }) {
+  return (
+    <ProtectedRoute>
+      <Layout>{children}</Layout>
+    </ProtectedRoute>
+  )
+}
+
 export default function App() {
   return (
     <Routes>
       {/* Public */}
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
       {/* Protected — wrapped in Layout */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Layout><Dashboard /></Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/students"
-        element={
-          <ProtectedRoute>
-            <Layout><Students /></Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/students/:id/history"
-        element={
-          <ProtectedRoute>
-            <Layout><TestHistory /></Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test/new"
-        element={
-          <ProtectedRoute>
-            <Layout><NewTest /></Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test/result/:id"
-        element={
-          <ProtectedRoute>
-            <Layout><TestResult /></Layout>
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/dashboard"             element={<Protected><Dashboard /></Protected>} />
+      <Route path="/students"              element={<Protected><Students /></Protected>} />
+      <Route path="/students/:id/history"  element={<Protected><TestHistory /></Protected>} />
+      <Route path="/test/new"              element={<Protected><NewTest /></Protected>} />
+      <Route path="/test/result/:id"       element={<Protected><TestResult /></Protected>} />
 
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      {/* New routes */}
+      <Route path="/history"               element={<Protected><HistoryLog /></Protected>} />
+      <Route path="/reports"               element={<Protected><Reports /></Protected>} />
+      <Route path="/rubric"                element={<Protected><Rubric /></Protected>} />
+      <Route path="/settings"              element={<Protected><Settings /></Protected>} />
+
+      {/* Default */}
+      <Route path="/"  element={<Navigate to="/dashboard" replace />} />
+      <Route path="*"  element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
 }
