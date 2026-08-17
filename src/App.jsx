@@ -12,6 +12,7 @@ import HistoryLog from './pages/HistoryLog'
 import Reports from './pages/Reports'
 import Rubric from './pages/Rubric'
 import Settings from './pages/Settings'
+import LiveScreen from './pages/LiveScreen'
 
 function PublicRoute({ children }) {
   const { session, isLoading } = useAuth()
@@ -46,6 +47,9 @@ export default function App() {
       <Route path="/reports"               element={<Protected><Reports /></Protected>} />
       <Route path="/rubric"                element={<Protected><Rubric /></Protected>} />
       <Route path="/settings"              element={<Protected><Settings /></Protected>} />
+
+      {/* Standalone Student Live Screen */}
+      <Route path="/live"                  element={<LiveScreen />} />
 
       {/* Default */}
       <Route path="/"  element={<Navigate to="/dashboard" replace />} />

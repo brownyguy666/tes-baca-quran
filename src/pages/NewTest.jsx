@@ -8,8 +8,25 @@ import QuranViewer from '../components/QuranViewer'
 import {
   ClipboardList, ChevronDown, ChevronUp, Save, Loader2,
   Info, AlertCircle, CheckCircle, User, Check, GraduationCap,
+  Tv, ExternalLink, Sparkles, Tag, PlusCircle,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+// ── Evaluasi Tajwid & Makhraj Quick Chips ──────────────────
+const EVALUATION_CHIPS = [
+  { id: 'waqaf_bagus', text: 'Waqaf & Ibtida\' Tepat 🌟', category: 'positive' },
+  { id: 'makhraj_bagus', text: 'Makhraj & Sifat Huruf Sangat Baik 🌟', category: 'positive' },
+  { id: 'tartil_bagus', text: 'Bacaan Rapi & Tartil 🌟', category: 'positive' },
+  { id: 'ghunnah', text: 'Ghunnah (Dengung) Kurang Panjang', category: 'eval' },
+  { id: 'qalqalah', text: 'Qalqalah Kurang Mantap/Memantul', category: 'eval' },
+  { id: 'mad_thabii', text: 'Mad Thabi\'i Terlalu Cepat (< 2 Harakat)', category: 'eval' },
+  { id: 'mad_wajib', text: 'Mad Wajib/Jaiz Kurang Panjang (4-5 Harakat)', category: 'eval' },
+  { id: 'makhraj_ain_ha', text: 'Makhraj \'Ain / Ha\' / Kha\' Tertukar', category: 'eval' },
+  { id: 'makhraj_tebal', text: 'Huruf Tebal (Shod/Dhad/Tho/Zho) Kurang Tegas', category: 'eval' },
+  { id: 'idgham', text: 'Idgham Bighunnah Belum Didengungkan', category: 'eval' },
+  { id: 'ikhfa', text: 'Ikhfa\' Haqiqi Belum Samar', category: 'eval' },
+  { id: 'tergesa', text: 'Tergesa-gesa / Kurang Lancar', category: 'eval' },
+]
 
 // ── Step Progress Bar ─────────────────────────────────────
 function StepBar({ current }) {
@@ -379,6 +396,27 @@ export default function NewTest() {
   const [ayatSampai, setAyatSampai] = useState('1')
 
   const selectedSurah = SURAHS.find((s) => String(s.no) === String(surahNo))
+  const [selectedChips, setSelectedChips] = useState([])
+
+  // Broadcast to Live Screen whenever selection changes
+  useEffect(() => {
+    if (!selectedSurah) return
+    const channel = supabase.channel('mushaf_live_sync')
+    channel.send({
+      type: 'broadcast',
+      event: 'mushaf_update',
+      payload: {
+        surahNo,
+        surahName: selectedSurah.latin,
+        surahArabic: selectedSurah.ar,
+        ayatDari,
+        ayatSampai,
+        studentName: selectedStudent?.nama || '',
+        studentClass: selectedStudent?.kelas || '',
+        guruName: profile?.name || '',
+      },
+    })
+  }, [surahNo, ayatDari, ayatSampai, selectedStudent, profile])
 
   // Sync computed ayat_dibaca whenever surah/range changes
   useEffect(() => {
@@ -394,6 +432,20 @@ export default function NewTest() {
       ayat_dibaca: `${selectedSurah.latin} (${range})`,
     }))
   }, [surahNo, ayatDari, ayatSampai])
+
+  const handleChipToggle = (chipText) => {
+    let next
+    if (selectedChips.includes(chipText)) {
+      next = selectedChips.filter((c) => c !== chipText)
+    } else {
+      next = [...selectedChips, chipText]
+    }
+    setSelectedChips(next)
+    setExtras((p) => ({
+      ...p,
+      catatan: next.join('; '),
+    }))
+  }
 
   const handleSurahChange = (e) => {
     const no = e.target.value
@@ -474,14 +526,34 @@ export default function NewTest() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="animate-in">
-        <h1 className="section-title flex items-center gap-2">
-          <ClipboardList className="w-6 h-6" style={{ color: '#d4af37' }} />
-          Tes Baru
-        </h1>
-        <p className="text-sm mt-1" style={{ color: '#475569' }}>
-          Isi penilaian saat mendengarkan murid membaca Al-Quran
-        </p>
+      <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="section-title flex items-center gap-2">
+            <ClipboardList className="w-6 h-6" style={{ color: '#d4af37' }} />
+            Tes Baru
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#475569' }}>
+            Isi penilaian saat mendengarkan murid membaca Al-Quran
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <a
+            href="/live"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.08))',
+              border: '1px solid rgba(99,102,241,0.35)',
+              color: '#c7d2fe',
+            }}
+            title="Buka Layar Siswa di Tablet / Laptop terpisah untuk dibaca siswa"
+          >
+            <Tv className="w-4 h-4 text-indigo-400" />
+            <span>Layar Siswa (Live)</span>
+            <ExternalLink className="w-3 h-3 opacity-60" />
+          </a>
+        </div>
       </div>
 
       {/* Step Progress Bar */}
@@ -752,12 +824,59 @@ export default function NewTest() {
             </div>
           )}
 
+          {/* ── Evaluasi Cepat Tajwid & Makhraj ── */}
+          <div className="space-y-2.5 pt-2">
+            <div className="flex items-center justify-between">
+              <label className="label mb-0 flex items-center gap-1.5" htmlFor="catatan-guru">
+                <Tag className="w-3.5 h-3.5 text-amber-400" />
+                Checklist Evaluasi Tajwid &amp; Makhraj
+              </label>
+              <span className="text-[11px] text-slate-500">Klik untuk menyusun catatan</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {EVALUATION_CHIPS.map((chip) => {
+                const isActive = selectedChips.includes(chip.text)
+                const isPositive = chip.category === 'positive'
+                return (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => handleChipToggle(chip.text)}
+                    className="text-xs px-3 py-1.5 rounded-xl font-medium transition-all duration-200"
+                    style={{
+                      background: isActive
+                        ? isPositive
+                          ? 'rgba(16,185,129,0.25)'
+                          : 'rgba(245,158,11,0.25)'
+                        : 'rgba(30,41,59,0.5)',
+                      border: `1px solid ${
+                        isActive
+                          ? isPositive
+                            ? 'rgba(16,185,129,0.6)'
+                            : 'rgba(245,158,11,0.6)'
+                          : 'rgba(255,255,255,0.07)'
+                      }`,
+                      color: isActive
+                        ? isPositive
+                          ? '#6ee7b7'
+                          : '#fcd34d'
+                        : '#94a3b8',
+                      boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
+                    }}
+                  >
+                    {chip.text}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <div>
-            <label className="label" htmlFor="catatan-guru">Catatan Guru (opsional)</label>
+            <label className="label" htmlFor="catatan-guru">Catatan Lengkap Guru (opsional)</label>
             <textarea
               id="catatan-guru" rows={2}
               className="input-field resize-none"
-              placeholder="Catatan tambahan mengenai bacaan murid…"
+              placeholder="Catatan tambahan mengenai bacaan murid (bisa diedit manual atau klik checklist di atas)…"
               value={extras.catatan}
               onChange={(e) => setExtras((p) => ({ ...p, catatan: e.target.value }))}
             />

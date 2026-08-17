@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, ClipboardList, LogOut,
   Menu, X, BookOpen, ChevronRight, FileText,
-  BarChart3, SlidersHorizontal, GraduationCap,
+  BarChart3, SlidersHorizontal, GraduationCap, Tv,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
@@ -15,6 +15,7 @@ const NAV_GROUPS = [
     items: [
       { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
       { to: '/test/new',  icon: ClipboardList,   label: 'Tes Baru' },
+      { to: '/live',      icon: Tv,              label: 'Layar Siswa', badge: 'Live' },
     ],
   },
   {
@@ -205,10 +206,11 @@ function SidebarContent({ onClose }) {
           <div key={group.label}>
             <p className="nav-group-label">{group.label}</p>
             <div className="space-y-0.5">
-              {group.items.map(({ to, icon: Icon, label }) => (
+              {group.items.map(({ to, icon: Icon, label, badge }) => (
                 <NavLink
                   key={to}
                   to={to}
+                  target={to === '/live' ? '_blank' : undefined}
                   onClick={onClose}
                   className={({ isActive }) =>
                     `sidebar-link group ${isActive ? 'active' : ''}`
@@ -221,10 +223,23 @@ function SidebarContent({ onClose }) {
                         style={{ color: isActive ? '#d4af37' : undefined }}
                       />
                       <span className="flex-1">{label}</span>
-                      {isActive && (
-                        <ChevronRight className="w-3 h-3 flex-shrink-0"
-                          style={{ color: '#d4af37' }} />
+                      {badge && (
+                        <span
+                          className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
+                          style={{
+                            background: 'rgba(16,185,129,0.18)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16,185,129,0.35)',
+                          }}
+                        >
+                          {badge}
+                        </span>
                       )}
+                      <ChevronRight
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isActive ? 'text-amber-400 opacity-100 translate-x-0.5' : 'text-slate-600 opacity-0 group-hover:opacity-100'
+                        }`}
+                      />
                     </>
                   )}
                 </NavLink>
