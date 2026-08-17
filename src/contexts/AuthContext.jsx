@@ -4,8 +4,8 @@ import { supabase } from '../lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession]   = useState(undefined) // undefined = loading
-  const [profile, setProfile]   = useState(null)
+  const [session, setSession] = useState(undefined) // undefined = loading
+  const [profile, setProfile] = useState(null)
 
   useEffect(() => {
     // Get initial session
@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Derive display name from session
+  // Derive display name from session user_metadata
   useEffect(() => {
     if (session?.user) {
       const meta = session.user.user_metadata
@@ -44,10 +44,25 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }
 
+  /**
+   * Update the logged-in user's display name.
+   * Persists to Supabase user_metadata.full_name
+   * and immediately reflects in the profile context.
+   */
+  const updateProfile = async ({ name }) => {
+    const { data, error } = await supabase.auth.updateUser({
+      data: { full_name: name },
+    })
+    if (error) return { error }
+    // Reflect change immediately without waiting for auth state change
+    setProfile((prev) => ({ ...prev, name }))
+    return { data }
+  }
+
   const isLoading = session === undefined
 
   return (
-    <AuthContext.Provider value={{ session, profile, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, profile, isLoading, signIn, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

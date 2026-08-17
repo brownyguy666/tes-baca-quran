@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { CRITERIA, getSummary, buildTestRecord, LEVELS } from '../utils/scoring'
+import { SURAHS } from '../utils/surahs'
 import {
   ClipboardList, ChevronDown, ChevronUp, Save, Loader2,
   Info, AlertCircle, CheckCircle, User, Check, GraduationCap,
@@ -371,6 +372,36 @@ export default function NewTest() {
     tanggal_tes: today, ayat_dibaca: '', catatan: '',
   })
 
+  // Surah + range state
+  const [surahNo, setSurahNo]       = useState('')
+  const [ayatDari, setAyatDari]     = useState('1')
+  const [ayatSampai, setAyatSampai] = useState('1')
+
+  const selectedSurah = SURAHS.find((s) => String(s.no) === String(surahNo))
+
+  // Sync computed ayat_dibaca whenever surah/range changes
+  useEffect(() => {
+    if (!selectedSurah) {
+      setExtras((p) => ({ ...p, ayat_dibaca: '' }))
+      return
+    }
+    const range = ayatDari === ayatSampai
+      ? `ayat ${ayatDari}`
+      : `ayat ${ayatDari}–${ayatSampai}`
+    setExtras((p) => ({
+      ...p,
+      ayat_dibaca: `${selectedSurah.latin} (${range})`,
+    }))
+  }, [surahNo, ayatDari, ayatSampai])
+
+  const handleSurahChange = (e) => {
+    const no = e.target.value
+    setSurahNo(no)
+    const surah = SURAHS.find((s) => String(s.no) === no)
+    setAyatDari('1')
+    setAyatSampai(surah ? String(surah.ayat) : '1')
+  }
+
   useEffect(() => { fetchStudents() }, [])
 
   const fetchStudents = async () => {
@@ -575,14 +606,14 @@ export default function NewTest() {
             <span
               className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
               style={{
-                background: extras.ayat_dibaca
+                background: selectedSurah
                   ? 'linear-gradient(135deg,#d4af37,#f59e0b)'
                   : 'rgba(99,102,241,0.3)',
-                border: extras.ayat_dibaca ? 'none' : '1px solid rgba(99,102,241,0.5)',
-                color: extras.ayat_dibaca ? '#0b0f19' : '#818cf8',
+                border: selectedSurah ? 'none' : '1px solid rgba(99,102,241,0.5)',
+                color: selectedSurah ? '#0b0f19' : '#818cf8',
               }}
             >
-              {extras.ayat_dibaca ? <Check className="w-3 h-3" /> : '2'}
+              {selectedSurah ? <Check className="w-3 h-3" /> : '2'}
             </span>
             Informasi Tes
           </h2>
@@ -597,16 +628,120 @@ export default function NewTest() {
                 required
               />
             </div>
-            <div>
-              <label className="label" htmlFor="ayat-dibaca">Surat / Ayat yang Dibaca</label>
-              <input
-                id="ayat-dibaca" type="text" className="input-field"
-                placeholder="Contoh: Al-Fatihah 1–7, Al-Baqarah"
-                value={extras.ayat_dibaca}
-                onChange={(e) => setExtras((p) => ({ ...p, ayat_dibaca: e.target.value }))}
-              />
-            </div>
           </div>
+
+          {/* ── Surah + Ayat picker ── */}
+          <div>
+            <label className="label" htmlFor="select-surah">Surat yang Dibaca</label>
+            <select
+              id="select-surah"
+              className="input-field"
+              value={surahNo}
+              onChange={handleSurahChange}
+            >
+              <option value="">-- Pilih surat --</option>
+              {SURAHS.map((s) => (
+                <option key={s.no} value={s.no}>
+                  {s.no}. {s.latin} ({s.ar}) — {s.ayat} ayat
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedSurah && (
+            <div className="space-y-3 animate-in">
+              {/* Surah info badge */}
+              <div
+                className="flex items-center gap-3 p-3 rounded-xl"
+                style={{
+                  background: 'rgba(212,175,55,0.08)',
+                  border: '1px solid rgba(212,175,55,0.2)',
+                }}
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
+                  style={{
+                    background: 'rgba(212,175,55,0.15)',
+                    border: '1px solid rgba(212,175,55,0.3)',
+                    color: '#d4af37',
+                  }}
+                >
+                  {selectedSurah.no}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm" style={{ color: '#fef3c7' }}>
+                    {selectedSurah.latin}
+                  </p>
+                  <p className="text-xs font-arabic" style={{ color: '#d4af37' }}>
+                    {selectedSurah.ar}
+                  </p>
+                  <p className="text-[11px] mt-0.5" style={{ color: '#475569' }}>
+                    {selectedSurah.ayat} ayat · Juz {selectedSurah.juz}
+                  </p>
+                </div>
+                <div
+                  className="text-xs px-2 py-1 rounded-lg flex-shrink-0"
+                  style={{
+                    background: 'rgba(212,175,55,0.12)',
+                    color: '#fcd34d',
+                  }}
+                >
+                  Q.S. {selectedSurah.no}
+                </div>
+              </div>
+
+              {/* Ayat range */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label" htmlFor="ayat-dari">Ayat Dari</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="ayat-dari"
+                      type="number"
+                      min="1"
+                      max={selectedSurah.ayat}
+                      className="input-field text-center font-bold"
+                      value={ayatDari}
+                      onChange={(e) => {
+                        const v = Math.max(1, Math.min(selectedSurah.ayat, Number(e.target.value)))
+                        setAyatDari(String(v))
+                        if (Number(ayatSampai) < v) setAyatSampai(String(v))
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="label" htmlFor="ayat-sampai">Ayat Sampai</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="ayat-sampai"
+                      type="number"
+                      min={ayatDari}
+                      max={selectedSurah.ayat}
+                      className="input-field text-center font-bold"
+                      value={ayatSampai}
+                      onChange={(e) => {
+                        const v = Math.max(Number(ayatDari), Math.min(selectedSurah.ayat, Number(e.target.value)))
+                        setAyatSampai(String(v))
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview */}
+              <div
+                className="text-sm text-center py-2.5 rounded-xl font-semibold"
+                style={{
+                  background: 'rgba(212,175,55,0.1)',
+                  border: '1px solid rgba(212,175,55,0.25)',
+                  color: '#fef3c7',
+                }}
+              >
+                📖 {extras.ayat_dibaca}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="label" htmlFor="catatan-guru">Catatan Guru (opsional)</label>
