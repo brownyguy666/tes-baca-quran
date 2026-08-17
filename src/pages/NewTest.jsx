@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { CRITERIA, getSummary, buildTestRecord, LEVELS } from '../utils/scoring'
 import { SURAHS } from '../utils/surahs'
+import QuranViewer from '../components/QuranViewer'
 import {
   ClipboardList, ChevronDown, ChevronUp, Save, Loader2,
   Info, AlertCircle, CheckCircle, User, Check, GraduationCap,
@@ -740,6 +741,14 @@ export default function NewTest() {
               >
                 📖 {extras.ayat_dibaca}
               </div>
+
+              {/* ── Quran Text Viewer (EQuran API) ── */}
+              <QuranViewer
+                surahNo={surahNo}
+                ayatDari={ayatDari}
+                ayatSampai={ayatSampai}
+                surahInfo={selectedSurah}
+              />
             </div>
           )}
 
