@@ -398,6 +398,13 @@ export default function NewTest() {
   const selectedSurah = SURAHS.find((s) => String(s.no) === String(surahNo))
   const [selectedChips, setSelectedChips] = useState([])
 
+  // Students filtered by selected class
+  const filteredStudents = selectedKelas
+    ? students.filter((s) => s.kelas === selectedKelas)
+    : students
+
+  const selectedStudent = students.find((s) => s.id === selectedId)
+
   // Broadcast to Live Screen whenever selection changes
   useEffect(() => {
     if (!selectedSurah) return
@@ -476,13 +483,6 @@ export default function NewTest() {
     }
     setLoading(false)
   }
-
-  // Students filtered by selected class
-  const filteredStudents = selectedKelas
-    ? students.filter((s) => s.kelas === selectedKelas)
-    : students
-
-  const selectedStudent = students.find((s) => s.id === selectedId)
 
   const handleScoreChange = (key, value) => {
     if (value === '') {
