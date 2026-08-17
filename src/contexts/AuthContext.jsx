@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Derive display name from session user_metadata
+  // Derive display name + NIP from session user_metadata
   useEffect(() => {
     if (session?.user) {
       const meta = session.user.user_metadata
@@ -29,6 +29,7 @@ export function AuthProvider({ children }) {
         id:    session.user.id,
         email: session.user.email,
         name:  meta?.full_name || meta?.name || session.user.email?.split('@')[0] || 'Guru',
+        nip:   meta?.nip || '',
       })
     } else {
       setProfile(null)
@@ -45,17 +46,18 @@ export function AuthProvider({ children }) {
   }
 
   /**
-   * Update the logged-in user's display name.
-   * Persists to Supabase user_metadata.full_name
-   * and immediately reflects in the profile context.
+   * Update the logged-in user's display name and NIP.
+   * Persists to Supabase user_metadata and immediately reflects in context.
    */
-  const updateProfile = async ({ name }) => {
+  const updateProfile = async ({ name, nip }) => {
     const { data, error } = await supabase.auth.updateUser({
-      data: { full_name: name },
+      data: {
+        full_name: name,
+        nip: nip ?? '',
+      },
     })
     if (error) return { error }
-    // Reflect change immediately without waiting for auth state change
-    setProfile((prev) => ({ ...prev, name }))
+    setProfile((prev) => ({ ...prev, name, nip: nip ?? '' }))
     return { data }
   }
 

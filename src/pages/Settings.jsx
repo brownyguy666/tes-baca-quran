@@ -1,18 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { CRITERIA } from '../utils/scoring'
 import {
-  SlidersHorizontal, User, Shield, Upload,
-  Bell, ChevronRight, Lock, Users, FileSpreadsheet,
-  CheckCircle, Construction,
+  SlidersHorizontal, User, Shield, Lock, Construction,
+  Edit2, Save, X, CheckCircle, Loader2, BadgeCheck,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
+// ── Shared Section Wrapper ──────────────────────────────────
 function SettingSection({ icon: Icon, title, color = '#d4af37', children }) {
   return (
     <div className="card p-5 space-y-4 animate-in">
-      <h2 className="font-bold flex items-center gap-2.5"
-          style={{ color: '#e2e8f0' }}>
+      <h2 className="font-bold flex items-center gap-2.5" style={{ color: '#e2e8f0' }}>
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: `${color}20`, color }}
@@ -42,10 +41,214 @@ function ComingSoonBadge() {
   )
 }
 
+// ── Avatar initials ─────────────────────────────────────────
+function Avatar({ name, size = 14 }) {
+  return (
+    <div
+      className={`w-${size} h-${size} rounded-full flex items-center justify-center font-black flex-shrink-0`}
+      style={{
+        background: 'linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.12))',
+        border: '2px solid rgba(212,175,55,0.45)',
+        color: '#d4af37',
+        fontSize: size > 10 ? '1.25rem' : '0.85rem',
+        width: `${size * 4}px`,
+        height: `${size * 4}px`,
+      }}
+    >
+      {(name || 'G').charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
+// ── Edit Profil Modal ───────────────────────────────────────
+function EditProfilModal({ profile, onClose, onSaved }) {
+  const { updateProfile } = useAuth()
+  const [name, setName]   = useState(profile?.name || '')
+  const [nip, setNip]     = useState(profile?.nip  || '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  // Validate: name cannot be empty
+  const nameOk = name.trim().length >= 3
+  // NIP optional; if provided must be numeric 8–18 digits
+  const nipOk  = nip === '' || /^\d{8,18}$/.test(nip.replace(/\s/g, ''))
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (!nameOk) { setError('Nama minimal 3 karakter'); return }
+    if (!nipOk)  { setError('NIP harus berupa angka 8–18 digit (atau kosongkan)'); return }
+
+    setSaving(true)
+    const { error: err } = await updateProfile({
+      name:  name.trim(),
+      nip:   nip.trim().replace(/\s/g, ''),
+    })
+    setSaving(false)
+
+    if (err) {
+      toast.error(`Gagal menyimpan: ${err.message}`)
+    } else {
+      toast.success('Profil berhasil diperbarui! ✅')
+      onSaved()
+    }
+  }
+
+  return (
+    /* Backdrop */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      {/* Modal panel */}
+      <div
+        className="w-full max-w-md rounded-2xl p-6 space-y-5 animate-in"
+        style={{
+          background: '#1e293b',
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.08)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(99,102,241,0.2)', color: '#818cf8' }}
+            >
+              <Edit2 className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-base" style={{ color: '#f8fafc' }}>
+                Edit Profil
+              </h3>
+              <p className="text-xs" style={{ color: '#475569' }}>
+                Data akan disimpan ke akun Anda
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+            style={{ color: '#475569' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Avatar preview */}
+        <div className="flex items-center gap-4 p-4 rounded-xl"
+             style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
+          <Avatar name={name || profile?.name} size={14} />
+          <div className="min-w-0">
+            <p className="font-bold truncate" style={{ color: '#e2e8f0' }}>
+              {name.trim() || <span style={{ color: '#334155' }}>Nama belum diisi</span>}
+            </p>
+            {nip && (
+              <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: '#64748b' }}>
+                <BadgeCheck className="w-3 h-3 text-indigo-400" />
+                NIP {nip}
+              </p>
+            )}
+            <p className="text-xs mt-0.5" style={{ color: '#334155' }}>
+              {profile?.email}
+            </p>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4" id="edit-profil-form">
+          {/* Nama lengkap */}
+          <div>
+            <label className="label" htmlFor="profil-name">
+              Nama Lengkap + Gelar <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <input
+              id="profil-name"
+              type="text"
+              className="input-field"
+              placeholder="Contoh: AJI BAGUS KHOIRI, S.Pd., Gr."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <p className="text-[11px] mt-1" style={{ color: '#334155' }}>
+              Sertakan gelar pendidikan dan kepangkatan (bila ada)
+            </p>
+          </div>
+
+          {/* NIP */}
+          <div>
+            <label className="label" htmlFor="profil-nip">
+              NIP{' '}
+              <span className="text-[10px] font-normal" style={{ color: '#475569' }}>
+                (opsional — khusus ASN)
+              </span>
+            </label>
+            <input
+              id="profil-nip"
+              type="text"
+              inputMode="numeric"
+              className="input-field"
+              placeholder="Contoh: 199501012020121001"
+              value={nip}
+              onChange={(e) => setNip(e.target.value.replace(/\D/g, '').slice(0, 18))}
+              maxLength={18}
+            />
+            <p className="text-[11px] mt-1" style={{ color: '#334155' }}>
+              Angka saja, maksimal 18 digit. Kosongkan jika bukan ASN/non-NIP.
+            </p>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div
+              className="text-sm px-3 py-2 rounded-xl"
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}
+            >
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary flex-1"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              id="save-profil-btn"
+              disabled={saving}
+              className="btn-primary flex-1 flex items-center justify-center gap-2"
+            >
+              {saving
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyimpan…</>
+                : <><Save className="w-4 h-4" /> Simpan</>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── Main Settings Page ──────────────────────────────────────
 export default function Settings() {
   const { profile } = useAuth()
 
-  // Local weight state (UI only — Supabase integration coming soon)
+  const [showEditProfil, setShowEditProfil] = useState(false)
+
+  // Local weight state (UI only)
   const [weights, setWeights] = useState(
     CRITERIA.reduce((acc, c) => ({ ...acc, [c.key]: Math.round(c.weight * 100) }), {})
   )
@@ -66,11 +269,21 @@ export default function Settings() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+
+      {/* Edit Profil Modal */}
+      {showEditProfil && (
+        <EditProfilModal
+          profile={profile}
+          onClose={() => setShowEditProfil(false)}
+          onSaved={() => setShowEditProfil(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="animate-in">
         <h1 className="section-title flex items-center gap-2">
           <SlidersHorizontal className="w-6 h-6" style={{ color: '#d4af37' }} />
-          Pengaturan System
+          Pengaturan Sistem
         </h1>
         <p className="text-sm mt-1" style={{ color: '#475569' }}>
           Konfigurasi bobot penilaian, akun, dan manajemen data
@@ -79,25 +292,27 @@ export default function Settings() {
 
       {/* ── Profil Akun ── */}
       <SettingSection icon={User} title="Profil Akun" color="#6366f1">
+        {/* Profile display */}
         <div
           className="flex items-center gap-4 p-4 rounded-xl"
           style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }}
         >
-          <div
-            className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-black flex-shrink-0"
-            style={{
-              background: 'linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.12))',
-              border: '2px solid rgba(212,175,55,0.45)',
-              color: '#d4af37',
-            }}
-          >
-            {(profile?.name || 'G').charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <p className="font-bold text-lg" style={{ color: '#f8fafc' }}>{profile?.name}</p>
-            <p className="text-sm" style={{ color: '#475569' }}>{profile?.email}</p>
+          <Avatar name={profile?.name} size={14} />
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-lg truncate" style={{ color: '#f8fafc' }}>
+              {profile?.name || '—'}
+            </p>
+            {profile?.nip && (
+              <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: '#64748b' }}>
+                <BadgeCheck className="w-3.5 h-3.5" style={{ color: '#818cf8' }} />
+                NIP {profile.nip}
+              </p>
+            )}
+            <p className="text-sm mt-0.5" style={{ color: '#475569' }}>
+              {profile?.email}
+            </p>
             <span
-              className="inline-block mt-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+              className="inline-block mt-2 text-[11px] font-bold px-2.5 py-0.5 rounded-full"
               style={{
                 background: 'rgba(212,175,55,0.15)',
                 border: '1px solid rgba(212,175,55,0.3)',
@@ -108,11 +323,15 @@ export default function Settings() {
             </span>
           </div>
         </div>
+
+        {/* Action buttons */}
         <div className="flex gap-3 flex-wrap">
           <button
-            className="btn-secondary flex items-center gap-2"
-            onClick={() => toast('Fitur edit profil segera hadir', { icon: '🔧' })}
+            id="edit-profil-btn"
+            className="btn-primary flex items-center gap-2"
+            onClick={() => setShowEditProfil(true)}
           >
+            <Edit2 className="w-4 h-4" />
             Edit Profil
           </button>
           <button
@@ -138,16 +357,21 @@ export default function Settings() {
                        style={{ color: '#cbd5e1' }}>
                   {c.icon} {c.label}
                 </label>
-                <span className="text-sm font-black" style={{ color: '#d4af37' }}>
-                  {weights[c.key]}%
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="text-base font-black tabular-nums"
+                    style={{ color: weightOk ? '#d4af37' : weights[c.key] > 0 ? '#f59e0b' : '#475569' }}
+                  >
+                    {weights[c.key]}%
+                  </span>
+                </div>
               </div>
               <input
                 type="range"
-                min="5" max="70" step="5"
+                min={0} max={100} step={5}
                 value={weights[c.key]}
                 onChange={(e) => handleWeightChange(c.key, e.target.value)}
-                className="w-full"
+                className="w-full accent-yellow-400"
               />
             </div>
           ))}
@@ -155,119 +379,54 @@ export default function Settings() {
 
         {/* Total indicator */}
         <div
-          className="flex items-center justify-between p-3.5 rounded-xl"
+          className="flex items-center justify-between p-3 rounded-xl"
           style={{
-            background: weightOk ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)',
-            border: `1px solid ${weightOk ? 'rgba(16,185,129,0.3)' : 'rgba(244,63,94,0.3)'}`,
+            background: weightOk ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+            border: `1px solid ${weightOk ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
           }}
         >
-          <span className="text-sm font-semibold"
-                style={{ color: weightOk ? '#34d399' : '#f87171' }}>
-            {weightOk ? '✅' : '⚠️'} Total Bobot
-          </span>
-          <span className="text-xl font-black"
-                style={{ color: weightOk ? '#34d399' : '#f87171' }}>
-            {totalWeight}%
-          </span>
+          <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>Total Bobot</span>
+          <div className="flex items-center gap-2">
+            {weightOk && <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />}
+            <span
+              className="text-lg font-black"
+              style={{ color: weightOk ? '#10b981' : '#ef4444' }}
+            >
+              {totalWeight}%
+            </span>
+          </div>
         </div>
-
         <button
-          className="btn-gold flex items-center gap-2"
           onClick={handleSaveWeights}
+          className="btn-primary flex items-center gap-2"
           disabled={!weightOk}
-          id="save-weights-btn"
         >
-          <CheckCircle className="w-4 h-4" /> Simpan Bobot
+          <Save className="w-4 h-4" />
+          Simpan Bobot
         </button>
       </SettingSection>
 
-      {/* ── Manajemen Penguji ── */}
-      <SettingSection icon={Users} title="Manajemen Akun Penguji" color="#3b82f6">
-        <div
-          className="rounded-xl p-4 flex items-center gap-3"
-          style={{
-            background: 'rgba(245,158,11,0.08)',
-            border: '1px solid rgba(245,158,11,0.2)',
-          }}
-        >
-          <Construction className="w-5 h-5 flex-shrink-0" style={{ color: '#f59e0b' }} />
-          <div>
-            <p className="text-sm font-semibold" style={{ color: '#fcd34d' }}>
-              Fitur dalam pengembangan
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
-              Manajemen multi-user (tambah / edit / hapus penguji) akan tersedia
-              pada update berikutnya.
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2 opacity-50 pointer-events-none select-none">
-          {['Tambah Akun Penguji', 'Atur Hak Akses per Kelas', 'Riwayat Login'].map((label) => (
+      {/* ── Keamanan ── */}
+      <SettingSection icon={Shield} title="Keamanan" color="#ef4444">
+        <div className="space-y-3">
+          {[
+            { label: 'Autentikasi Dua Faktor (2FA)', desc: 'Tambah lapisan keamanan ekstra pada login' },
+            { label: 'Log Aktivitas Login',          desc: 'Riwayat semua sesi masuk akun' },
+          ].map(({ label, desc }) => (
             <div
               key={label}
               className="flex items-center justify-between p-3 rounded-xl"
-              style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'rgba(15,23,42,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}
             >
-              <span className="text-sm" style={{ color: '#475569' }}>{label}</span>
-              <div className="flex items-center gap-2">
-                <ComingSoonBadge />
-                <ChevronRight className="w-4 h-4" style={{ color: '#334155' }} />
+              <div>
+                <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>{label}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#475569' }}>{desc}</p>
               </div>
+              <ComingSoonBadge />
             </div>
           ))}
         </div>
       </SettingSection>
-
-      {/* ── Import Data ── */}
-      <SettingSection icon={FileSpreadsheet} title="Import & Kenaikan Kelas" color="#10b981">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            { label: 'Import Murid via CSV/Excel', desc: 'Upload file untuk tambah murid massal', icon: Upload },
-            { label: 'Kenaikan Kelas Massal', desc: 'Naikkan kelas semua murid sekaligus', icon: Users },
-          ].map(({ label, desc, icon: Icon }) => (
-            <div
-              key={label}
-              className="p-4 rounded-xl cursor-not-allowed opacity-60"
-              style={{
-                background: 'rgba(16,185,129,0.08)',
-                border: '1px solid rgba(16,185,129,0.2)',
-              }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <Icon className="w-4 h-4" style={{ color: '#10b981' }} />
-                <p className="text-sm font-semibold" style={{ color: '#6ee7b7' }}>{label}</p>
-                <ComingSoonBadge />
-              </div>
-              <p className="text-xs" style={{ color: '#475569' }}>{desc}</p>
-            </div>
-          ))}
-        </div>
-      </SettingSection>
-
-      {/* ── Notifikasi ── */}
-      <SettingSection icon={Bell} title="Notifikasi" color="#8b5cf6">
-        <div className="space-y-3 opacity-60 pointer-events-none">
-          {[
-            'Notifikasi saat ada tes baru',
-            'Pengingat murid belum dites bulan ini',
-            'Laporan mingguan via email',
-          ].map((item) => (
-            <div key={item}
-                 className="flex items-center justify-between p-3 rounded-xl"
-                 style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-sm" style={{ color: '#475569' }}>{item}</span>
-              <div className="flex items-center gap-2">
-                <ComingSoonBadge />
-                <div className="w-10 h-5 rounded-full" style={{ background: '#1e293b', border: '1px solid #334155' }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </SettingSection>
-
-      <p className="text-xs text-center pb-4 animate-in" style={{ color: '#1e293b' }}>
-        Sistem Penilaian Baca Al-Quran · SMP Negeri 2 Glagah · v2.0
-      </p>
     </div>
   )
 }
