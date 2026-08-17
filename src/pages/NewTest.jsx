@@ -12,21 +12,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// ── Evaluasi Tajwid & Makhraj Quick Chips ──────────────────
-const EVALUATION_CHIPS = [
-  { id: 'waqaf_bagus', text: 'Waqaf & Ibtida\' Tepat 🌟', category: 'positive' },
-  { id: 'makhraj_bagus', text: 'Makhraj & Sifat Huruf Sangat Baik 🌟', category: 'positive' },
-  { id: 'tartil_bagus', text: 'Bacaan Rapi & Tartil 🌟', category: 'positive' },
-  { id: 'ghunnah', text: 'Ghunnah (Dengung) Kurang Panjang', category: 'eval' },
-  { id: 'qalqalah', text: 'Qalqalah Kurang Mantap/Memantul', category: 'eval' },
-  { id: 'mad_thabii', text: 'Mad Thabi\'i Terlalu Cepat (< 2 Harakat)', category: 'eval' },
-  { id: 'mad_wajib', text: 'Mad Wajib/Jaiz Kurang Panjang (4-5 Harakat)', category: 'eval' },
-  { id: 'makhraj_ain_ha', text: 'Makhraj \'Ain / Ha\' / Kha\' Tertukar', category: 'eval' },
-  { id: 'makhraj_tebal', text: 'Huruf Tebal (Shod/Dhad/Tho/Zho) Kurang Tegas', category: 'eval' },
-  { id: 'idgham', text: 'Idgham Bighunnah Belum Didengungkan', category: 'eval' },
-  { id: 'ikhfa', text: 'Ikhfa\' Haqiqi Belum Samar', category: 'eval' },
-  { id: 'tergesa', text: 'Tergesa-gesa / Kurang Lancar', category: 'eval' },
-]
+import { TAJWID_CATEGORIES } from '../utils/tajwidChecklist'
 
 // ── Step Progress Bar ─────────────────────────────────────
 function StepBar({ current }) {
@@ -397,6 +383,7 @@ export default function NewTest() {
 
   const selectedSurah = SURAHS.find((s) => String(s.no) === String(surahNo))
   const [selectedChips, setSelectedChips] = useState([])
+  const [activeCategory, setActiveCategory] = useState('all')
 
   // Students filtered by selected class
   const filteredStudents = selectedKelas
@@ -824,50 +811,128 @@ export default function NewTest() {
             </div>
           )}
 
-          {/* ── Evaluasi Cepat Tajwid & Makhraj ── */}
-          <div className="space-y-2.5 pt-2">
-            <div className="flex items-center justify-between">
+          {/* ── Evaluasi Cepat Tajwid & Makhraj Berkelompok ── */}
+          <div className="space-y-3 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <label className="label mb-0 flex items-center gap-1.5" htmlFor="catatan-guru">
                 <Tag className="w-3.5 h-3.5 text-amber-400" />
-                Checklist Evaluasi Tajwid &amp; Makhraj
+                Checklist Evaluasi Tajwid, Makhraj &amp; Kelancaran
+                {selectedChips.length > 0 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold ml-1">
+                    {selectedChips.length} dipilih
+                  </span>
+                )}
               </label>
-              <span className="text-[11px] text-slate-500">Klik untuk menyusun catatan</span>
+              {selectedChips.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedChips([])
+                    setExtras((p) => ({ ...p, catatan: '' }))
+                  }}
+                  className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 underline self-end sm:self-auto"
+                >
+                  Bersihkan Checklist
+                </button>
+              )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {EVALUATION_CHIPS.map((chip) => {
-                const isActive = selectedChips.includes(chip.text)
-                const isPositive = chip.category === 'positive'
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setActiveCategory('all')}
+                className="text-xs px-3 py-1 rounded-xl font-semibold flex-shrink-0 transition-colors"
+                style={{
+                  background: activeCategory === 'all' ? 'rgba(212,175,55,0.25)' : 'rgba(30,41,59,0.6)',
+                  border: `1px solid ${activeCategory === 'all' ? 'rgba(212,175,55,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                  color: activeCategory === 'all' ? '#fef3c7' : '#94a3b8',
+                }}
+              >
+                Semua Kategori
+              </button>
+              {TAJWID_CATEGORIES.map((cat) => {
+                const countInCat = cat.items.filter((it) => selectedChips.includes(it.text)).length
+                const isCatActive = activeCategory === cat.id
                 return (
                   <button
-                    key={chip.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => handleChipToggle(chip.text)}
-                    className="text-xs px-3 py-1.5 rounded-xl font-medium transition-all duration-200"
+                    onClick={() => setActiveCategory(cat.id)}
+                    className="text-xs px-3 py-1 rounded-xl font-semibold flex-shrink-0 flex items-center gap-1.5 transition-colors"
                     style={{
-                      background: isActive
-                        ? isPositive
-                          ? 'rgba(16,185,129,0.25)'
-                          : 'rgba(245,158,11,0.25)'
-                        : 'rgba(30,41,59,0.5)',
-                      border: `1px solid ${
-                        isActive
-                          ? isPositive
-                            ? 'rgba(16,185,129,0.6)'
-                            : 'rgba(245,158,11,0.6)'
-                          : 'rgba(255,255,255,0.07)'
-                      }`,
-                      color: isActive
-                        ? isPositive
-                          ? '#6ee7b7'
-                          : '#fcd34d'
-                        : '#94a3b8',
-                      boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
+                      background: isCatActive ? 'rgba(99,102,241,0.25)' : 'rgba(30,41,59,0.6)',
+                      border: `1px solid ${isCatActive ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                      color: isCatActive ? '#c7d2fe' : '#94a3b8',
                     }}
                   >
-                    {chip.text}
+                    <span>{cat.icon}</span>
+                    <span>{cat.name.split(' ')[0]}</span>
+                    {countInCat > 0 && (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500/30 text-emerald-300 text-[10px] flex items-center justify-center font-bold">
+                        {countInCat}
+                      </span>
+                    )}
                   </button>
                 )
               })}
+            </div>
+
+            {/* Chips by category */}
+            <div className="space-y-3 pt-1">
+              {TAJWID_CATEGORIES
+                .filter((cat) => activeCategory === 'all' || activeCategory === cat.id)
+                .map((cat) => (
+                  <div
+                    key={cat.id}
+                    className="p-3 rounded-2xl space-y-2"
+                    style={{
+                      background: 'rgba(15,23,42,0.5)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+                      <span>{cat.icon}</span>
+                      <span style={{ color: '#cbd5e1' }}>{cat.name}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {cat.items.map((item) => {
+                        const isActive = selectedChips.includes(item.text)
+                        const isPositive = item.type === 'positive'
+                        return (
+                          <button
+                            key={item.text}
+                            type="button"
+                            onClick={() => handleChipToggle(item.text)}
+                            className="text-xs px-3 py-1.5 rounded-xl font-medium text-left transition-all duration-200"
+                            style={{
+                              background: isActive
+                                ? isPositive
+                                  ? 'rgba(16,185,129,0.25)'
+                                  : 'rgba(245,158,11,0.25)'
+                                : 'rgba(30,41,59,0.7)',
+                              border: `1px solid ${
+                                isActive
+                                  ? isPositive
+                                    ? 'rgba(16,185,129,0.6)'
+                                    : 'rgba(245,158,11,0.6)'
+                                  : 'rgba(255,255,255,0.07)'
+                              }`,
+                              color: isActive
+                                ? isPositive
+                                  ? '#6ee7b7'
+                                  : '#fcd34d'
+                                : '#94a3b8',
+                              boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
+                            }}
+                          >
+                            {item.text}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
 
