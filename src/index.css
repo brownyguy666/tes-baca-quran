@@ -289,7 +289,7 @@ body {
   }
   @media (max-width: 767px) {
     .mobile-content-pad {
-      padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 8px);
+      padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 90px) !important;
     }
   }
 

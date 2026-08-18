@@ -103,7 +103,7 @@ export default function DemoAssessment() {
     : null
 
   return (
-    <div className="max-w-4xl w-full mx-auto space-y-6 min-w-0">
+    <div className="max-w-4xl w-full mx-auto space-y-6 min-w-0 pb-28 sm:pb-8">
       {/* ── Banner Header Demo ── */}
       <div
         className="card p-5 sm:p-6 rounded-2xl animate-in space-y-3 relative overflow-hidden"

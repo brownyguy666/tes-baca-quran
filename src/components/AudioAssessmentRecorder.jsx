@@ -307,49 +307,49 @@ export default function AudioAssessmentRecorder({
       </div>
 
       {/* Main recording controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
         {/* State 1: IDLE */}
         {status === 'idle' && (
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
             <button
               type="button"
               onClick={handleStartRecording}
-              className="btn-gold flex items-center justify-center gap-2 py-2.5 px-4 text-xs sm:text-sm font-bold w-full sm:w-auto shadow-lg"
+              className="btn-gold flex items-center justify-center gap-2.5 py-3.5 px-6 text-sm font-bold w-full sm:w-auto shadow-xl active:scale-95"
             >
-              <Mic className="w-4 h-4 text-amber-900 animate-pulse" />
+              <Mic className="w-5 h-5 text-amber-900 animate-pulse" />
               <span>Mulai Rekam Bacaan Murid</span>
             </button>
-            <span className="text-[11px] text-slate-500 hidden sm:inline">
-              (Pastikan mikrofon HP/laptop aktif)
+            <span className="text-xs text-slate-400 text-center sm:text-left">
+              🎙️ Tekan untuk mulai mendengarkan
             </span>
           </div>
         )}
 
         {/* State 2: RECORDING */}
         {status === 'recording' && (
-          <div className="flex items-center justify-between w-full gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 h-5">
-                <span className="w-1 bg-rose-400 rounded-full animate-[bounce_1s_infinite_100ms] h-4" />
-                <span className="w-1 bg-rose-400 rounded-full animate-[bounce_1s_infinite_300ms] h-6" />
-                <span className="w-1 bg-rose-400 rounded-full animate-[bounce_1s_infinite_200ms] h-3" />
-                <span className="w-1 bg-rose-400 rounded-full animate-[bounce_1s_infinite_400ms] h-5" />
+                <span className="w-1.5 bg-rose-400 rounded-full animate-[bounce_1s_infinite_100ms] h-4" />
+                <span className="w-1.5 bg-rose-400 rounded-full animate-[bounce_1s_infinite_300ms] h-6" />
+                <span className="w-1.5 bg-rose-400 rounded-full animate-[bounce_1s_infinite_200ms] h-3" />
+                <span className="w-1.5 bg-rose-400 rounded-full animate-[bounce_1s_infinite_400ms] h-5" />
               </div>
-              <span className="font-mono text-sm font-bold text-rose-300">
+              <span className="font-mono text-base font-bold text-rose-300">
                 {formatTimer(recordTime)}
               </span>
             </div>
             <button
               type="button"
               onClick={handleStopRecording}
-              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all duration-200"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 shadow-xl"
               style={{
                 background: 'linear-gradient(135deg, #ef4444, #dc2626)',
                 color: '#fff',
-                boxShadow: '0 4px 12px rgba(239,68,68,0.4)',
+                boxShadow: '0 4px 16px rgba(239,68,68,0.5)',
               }}
             >
-              <Square className="w-3.5 h-3.5 fill-current" />
+              <Square className="w-4 h-4 fill-current" />
               <span>Selesai Membaca</span>
             </button>
           </div>
