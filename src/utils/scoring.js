@@ -56,13 +56,14 @@ export const CRITERIA = [
 
 /**
  * Level thresholds — ordered from highest to lowest for easy matching
+ * Score < 50 requires remedial (Wajib Remidi / Mengulang)
  */
 export const LEVELS = [
-  { min: 91,  max: 100, label: 'Mumtaz (Tartil)', color: 'level-mumtaz', emoji: '🌟', colorHex: '#f59e0b' },
-  { min: 76,  max: 90,  label: 'Mahir',           color: 'level-mahir',  emoji: '✅', colorHex: '#22c55e' },
-  { min: 61,  max: 75,  label: 'Menengah',         color: 'level-menengah', emoji: '📈', colorHex: '#f59e0b' },
-  { min: 41,  max: 60,  label: 'Dasar',            color: 'level-dasar',  emoji: '📚', colorHex: '#60a5fa' },
-  { min: 0,   max: 40,  label: 'Pemula',           color: 'level-pemula', emoji: '🌱', colorHex: '#9ca3af' },
+  { min: 91,  max: 100, label: 'Mumtaz (Tartil)',          color: 'level-mumtaz',   emoji: '🌟', colorHex: '#d97706', passed: true,  desc: 'Istimewa & Sangat Fasih' },
+  { min: 76,  max: 90,  label: 'Mahir',                    color: 'level-mahir',    emoji: '✅', colorHex: '#16a34a', passed: true,  desc: 'Lancar & Memenuhi Tajwid' },
+  { min: 61,  max: 75,  label: 'Menengah',                  color: 'level-menengah', emoji: '📈', colorHex: '#ea580c', passed: true,  desc: 'Cukup Baik & Perlu Latihan' },
+  { min: 50,  max: 60,  label: 'Dasar (Cukup)',            color: 'level-dasar',    emoji: '📚', colorHex: '#3b82f6', passed: true,  desc: 'Batas Minimum Kelulusan' },
+  { min: 0,   max: 49,  label: 'Remidi (Wajib Mengulang)', color: 'level-pemula',   emoji: '⚠️', colorHex: '#dc2626', passed: false, desc: 'Wajib Bimbingan & Remidi' },
 ]
 
 /**
