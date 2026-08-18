@@ -255,15 +255,49 @@ export default function Settings() {
   const totalWeight = Object.values(weights).reduce((s, v) => s + Number(v), 0)
   const weightOk    = totalWeight === 100
 
-  const handleWeightChange = (key, val) => {
-    setWeights((prev) => ({ ...prev, [key]: Number(val) }))
+  // Auto-balance: when one slider moves, the remaining % is distributed
+  // proportionally between the other two sliders so total is always 100.
+  const handleWeightChange = (changedKey, rawVal) => {
+    const newVal = Number(rawVal)
+    const otherKeys = CRITERIA.map((c) => c.key).filter((k) => k !== changedKey)
+
+    // How much is left for the other two
+    const remaining = 100 - newVal
+
+    // Get current sum of others
+    const othersSum = otherKeys.reduce((s, k) => s + weights[k], 0)
+
+    setWeights((prev) => {
+      const next = { ...prev, [changedKey]: newVal }
+
+      if (othersSum === 0) {
+        // Split remaining equally if others are 0
+        const each = Math.floor(remaining / otherKeys.length)
+        otherKeys.forEach((k, i) => {
+          next[k] = i === otherKeys.length - 1
+            ? remaining - each * (otherKeys.length - 1)
+            : each
+        })
+      } else {
+        // Distribute proportionally
+        let assigned = 0
+        otherKeys.forEach((k, i) => {
+          if (i === otherKeys.length - 1) {
+            // Last one takes the rest to avoid rounding drift
+            next[k] = remaining - assigned
+          } else {
+            const share = Math.round((prev[k] / othersSum) * remaining)
+            next[k] = share
+            assigned += share
+          }
+        })
+      }
+
+      return next
+    })
   }
 
   const handleSaveWeights = () => {
-    if (!weightOk) {
-      toast.error(`Total bobot harus 100% (saat ini ${totalWeight}%)`)
-      return
-    }
     toast.success('Pengaturan bobot disimpan (simulasi) ✅')
   }
 
@@ -345,9 +379,9 @@ export default function Settings() {
 
       {/* ── Bobot Penilaian ── */}
       <SettingSection icon={SlidersHorizontal} title="Bobot Penilaian" color="#d4af37">
-        <p className="text-sm" style={{ color: '#64748b' }}>
+        <p className="text-xs" style={{ color: '#475569' }}>
           Sesuaikan bobot per kriteria jika ada perubahan kebijakan kurikulum.
-          Total bobot harus tepat 100%.
+          Slider lain menyesuaikan otomatis agar selalu tepat 100%.
         </p>
         <div className="space-y-4">
           {CRITERIA.map((c) => (
@@ -381,17 +415,17 @@ export default function Settings() {
         <div
           className="flex items-center justify-between p-3 rounded-xl"
           style={{
-            background: weightOk ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-            border: `1px solid ${weightOk ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
+            background: 'rgba(16,185,129,0.08)',
+            border: '1px solid rgba(16,185,129,0.25)',
           }}
         >
-          <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>Total Bobot</span>
+          <div>
+            <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>Total Bobot</span>
+            <p className="text-[10px] mt-0.5" style={{ color: '#475569' }}>Otomatis diseimbangkan ke 100%</p>
+          </div>
           <div className="flex items-center gap-2">
-            {weightOk && <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />}
-            <span
-              className="text-lg font-black"
-              style={{ color: weightOk ? '#10b981' : '#ef4444' }}
-            >
+            <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />
+            <span className="text-lg font-black" style={{ color: '#10b981' }}>
               {totalWeight}%
             </span>
           </div>
@@ -399,7 +433,6 @@ export default function Settings() {
         <button
           onClick={handleSaveWeights}
           className="btn-primary flex items-center gap-2"
-          disabled={!weightOk}
         >
           <Save className="w-4 h-4" />
           Simpan Bobot

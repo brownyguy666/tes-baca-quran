@@ -418,9 +418,14 @@ export default function NewTest() {
       setExtras((p) => ({ ...p, ayat_dibaca: '' }))
       return
     }
-    const range = ayatDari === ayatSampai
-      ? `ayat ${ayatDari}`
-      : `ayat ${ayatDari}–${ayatSampai}`
+    // Only build the label when both fields have a valid number
+    const d = parseInt(ayatDari, 10)
+    const s = parseInt(ayatSampai, 10)
+    if (!ayatDari || !ayatSampai || isNaN(d) || isNaN(s)) {
+      setExtras((p) => ({ ...p, ayat_dibaca: '' }))
+      return
+    }
+    const range = d === s ? `ayat ${d}` : `ayat ${d}–${s}`
     setExtras((p) => ({
       ...p,
       ayat_dibaca: `${selectedSurah.latin} (${range})`,
@@ -757,15 +762,29 @@ export default function NewTest() {
                   <div className="flex items-center gap-2">
                     <input
                       id="ayat-dari"
-                      type="number"
-                      min="1"
-                      max={selectedSurah.ayat}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       className="input-field text-center font-bold"
+                      placeholder="1"
                       value={ayatDari}
                       onChange={(e) => {
-                        const v = Math.max(1, Math.min(selectedSurah.ayat, Number(e.target.value)))
-                        setAyatDari(String(v))
-                        if (Number(ayatSampai) < v) setAyatSampai(String(v))
+                        // Allow empty or numeric only while typing
+                        const raw = e.target.value.replace(/\D/g, '')
+                        setAyatDari(raw)
+                      }}
+                      onBlur={() => {
+                        // Clamp on blur: restore to 1 if empty/invalid
+                        const v = parseInt(ayatDari, 10)
+                        if (!ayatDari || isNaN(v) || v < 1) {
+                          setAyatDari('1')
+                          if (parseInt(ayatSampai, 10) < 1) setAyatSampai('1')
+                        } else {
+                          const clamped = Math.min(v, selectedSurah.ayat)
+                          setAyatDari(String(clamped))
+                          if (parseInt(ayatSampai, 10) < clamped)
+                            setAyatSampai(String(clamped))
+                        }
                       }}
                     />
                   </div>
@@ -775,14 +794,24 @@ export default function NewTest() {
                   <div className="flex items-center gap-2">
                     <input
                       id="ayat-sampai"
-                      type="number"
-                      min={ayatDari}
-                      max={selectedSurah.ayat}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       className="input-field text-center font-bold"
+                      placeholder={String(selectedSurah.ayat)}
                       value={ayatSampai}
                       onChange={(e) => {
-                        const v = Math.max(Number(ayatDari), Math.min(selectedSurah.ayat, Number(e.target.value)))
-                        setAyatSampai(String(v))
+                        const raw = e.target.value.replace(/\D/g, '')
+                        setAyatSampai(raw)
+                      }}
+                      onBlur={() => {
+                        const vDari = parseInt(ayatDari, 10) || 1
+                        const v = parseInt(ayatSampai, 10)
+                        if (!ayatSampai || isNaN(v) || v < vDari) {
+                          setAyatSampai(String(vDari))
+                        } else {
+                          setAyatSampai(String(Math.min(v, selectedSurah.ayat)))
+                        }
                       }}
                     />
                   </div>
