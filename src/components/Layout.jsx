@@ -76,15 +76,12 @@ function Topbar({ onMenuClick }) {
 
       {/* School branding — desktop */}
       <div className="hidden md:flex items-center gap-3">
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.08))',
-            border: '1px solid rgba(212,175,55,0.3)',
-          }}
-        >
-          <GraduationCap className="w-4 h-4" style={{ color: '#d4af37' }} />
-        </div>
+        <img
+          src="/logo-smpn2glagah.png"
+          alt="Logo SMPN 2 Glagah"
+          className="w-9 h-9 object-contain flex-shrink-0"
+          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
+        />
         <div>
           <p
             className="text-xs font-black uppercase tracking-widest leading-none"
@@ -100,7 +97,11 @@ function Topbar({ onMenuClick }) {
 
       {/* Mobile brand */}
       <div className="md:hidden flex items-center gap-2">
-        <BookOpen className="w-4 h-4" style={{ color: '#d4af37' }} />
+        <img
+          src="/logo-smpn2glagah.png"
+          alt="Logo"
+          className="w-7 h-7 object-contain"
+        />
         <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>
           Tes Baca Al-Quran
         </span>
@@ -149,25 +150,22 @@ function SidebarContent({ onClose }) {
       {/* ── Brand / Logo ── */}
       <div className="px-5 pt-6 pb-4 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.08))',
-              border: '1px solid rgba(212,175,55,0.35)',
-            }}
-          >
-            <BookOpen className="w-5 h-5" style={{ color: '#d4af37' }} />
-          </div>
+          <img
+            src="/logo-smpn2glagah.png"
+            alt="Logo SMPN 2 Glagah"
+            className="w-12 h-12 object-contain flex-shrink-0"
+            style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.5))' }}
+          />
           <div className="min-w-0">
             <p
               className="text-[11px] font-black uppercase tracking-widest leading-none"
               style={{ color: '#d4af37' }}
             >
-              Tes Baca
+              SMPN 2 Glagah
             </p>
-            <p className="text-sm font-semibold truncate leading-tight mt-0.5"
-               style={{ color: '#e2e8f0' }}>
-              Al-Quran
+            <p className="text-xs font-semibold truncate leading-tight mt-0.5"
+               style={{ color: '#94a3b8' }}>
+              Penilaian Baca Al-Quran
             </p>
           </div>
         </div>

@@ -167,7 +167,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             ══════════════════════════════════════════════════════════ */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '18px', marginBottom: '4px' }}>
           <img
-            src="/school-logo.png"
+            src="/logo-smpn2glagah.png"
             alt="Logo SMPN 2 Glagah"
             style={{
               width: '68px',
@@ -195,7 +195,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             </p>
           </div>
           <img
-            src="/school-logo.png"
+            src="/logo-smpn2glagah.png"
             alt="Logo SMPN 2 Glagah"
             style={{
               width: '68px',
@@ -229,13 +229,15 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             SERTIFIKAT KELULUSAN
           </h2>
 
-          {/* Emerald & Gold Ribbon Banner */}
+          {/* Emerald & Gold Ribbon Banner — includes cert number inside */}
           <div style={{
-            display: 'inline-block',
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             background: 'linear-gradient(135deg, #14532d 0%, #166534 50%, #0f3922 100%)',
             border: '1.5px solid #c9a227',
             borderRadius: '20px',
-            padding: '4px 28px',
+            padding: '5px 36px',
             margin: '4px 0 2px 0',
             boxShadow: '0 2px 10px rgba(20,83,45,0.25)',
           }}>
@@ -249,11 +251,17 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             }}>
               TES KEMAMPUAN BACA AL-QUR'AN
             </p>
+            {/* Nomor sertifikat di dalam banner hijau */}
+            <p style={{
+              fontSize: '9px',
+              color: 'rgba(254,243,199,0.8)',
+              margin: '2px 0 0 0',
+              fontStyle: 'italic',
+              letterSpacing: '0.03em',
+            }}>
+              Nomor: 421.3 / BQ-{docNo} / SMPN2GLG / {yearStr}
+            </p>
           </div>
-
-          <p style={{ fontSize: '9px', color: '#64748b', margin: '2px 0 0 0', fontStyle: 'italic' }}>
-            Nomor: 421.3 / BQ-{docNo} / SMPN2GLG / {yearStr}
-          </p>
         </div>
 
         {/* ══════════════════════════════════════════════════════════
@@ -385,8 +393,28 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                     {levelBadge.emoji} {result.level}
                   </p>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '2px 8px', textAlign: 'center' }}>
-                  <span style={{ fontSize: '9px', color: levelBadge.text, fontWeight: 700 }}>Skor: {result.skor_total}</span>
+                {/* Score box — bold, centered, high contrast */}
+                <div style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: '1.5px solid rgba(255,255,255,0.4)',
+                  borderRadius: '10px',
+                  padding: '4px 14px',
+                  textAlign: 'center',
+                  minWidth: '64px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <span style={{ fontSize: '8px', color: levelBadge.text, fontWeight: 700, opacity: 0.85, letterSpacing: '0.05em' }}>SKOR</span>
+                  <span style={{
+                    fontSize: '22px',
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    fontFamily: 'monospace',
+                    lineHeight: 1.1,
+                    textShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                  }}>{result.skor_total}</span>
                 </div>
               </div>
 
@@ -434,7 +462,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               SRIATUN, S.Pd.
             </p>
             <p style={{ fontSize: '9.5px', color: '#64748b', margin: '1px 0 0 0' }}>
-              NIP. .........................................
+              NIP. 197006061999032006
             </p>
           </div>
 
@@ -455,7 +483,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               }}
             >
               <img
-                src="/school-logo.png"
+                src="/logo-smpn2glagah.png"
                 alt="Seal"
                 style={{ width: '40px', height: '40px', objectFit: 'contain' }}
               />
