@@ -34,22 +34,22 @@ export default function DemoAssessment() {
   const [isDownloading, setIsDownloading] = useState(false)
 
   const selectedSurah = useMemo(
-    () => SURAHS.find((s) => s.nomor === Number(surahNo)) || SURAHS[0],
+    () => SURAHS.find((s) => Number(s.no) === Number(surahNo)) || SURAHS[0],
     [surahNo]
   )
 
   const handleSelectQuickSurah = (item) => {
-    setSurahNo(item.surahNo)
-    setAyatDari(item.from)
-    setAyatSampai(item.to)
+    setSurahNo(Number(item.surahNo))
+    setAyatDari(Number(item.from))
+    setAyatSampai(Number(item.to))
     setEvalResult(null)
   }
 
   const handleSurahChange = (no) => {
-    const s = SURAHS.find((x) => x.nomor === Number(no))
+    const s = SURAHS.find((x) => Number(x.no) === Number(no))
     setSurahNo(Number(no))
     setAyatDari(1)
-    setAyatSampai(s ? Math.min(7, s.jumlahAyat) : 1)
+    setAyatSampai(s ? Math.min(7, s.ayat) : 1)
     setEvalResult(null)
   }
 
@@ -225,8 +225,8 @@ export default function DemoAssessment() {
               onChange={(e) => handleSurahChange(e.target.value)}
             >
               {SURAHS.map((s) => (
-                <option key={s.nomor} value={s.nomor}>
-                  {s.nomor}. {s.latin} ({s.jumlahAyat} ayat)
+                <option key={s.no} value={s.no}>
+                  {s.no}. {s.latin} ({s.ayat} ayat)
                 </option>
               ))}
             </select>
@@ -237,9 +237,9 @@ export default function DemoAssessment() {
             <input
               type="number"
               min="1"
-              max={selectedSurah.jumlahAyat}
+              max={selectedSurah?.ayat || 7}
               value={ayatDari}
-              onChange={(e) => setAyatDari(Math.min(selectedSurah.jumlahAyat, Math.max(1, Number(e.target.value))))}
+              onChange={(e) => setAyatDari(Math.min(selectedSurah?.ayat || 7, Math.max(1, Number(e.target.value))))}
               className="input-field text-xs sm:text-sm py-2"
             />
           </div>
@@ -249,9 +249,9 @@ export default function DemoAssessment() {
             <input
               type="number"
               min={ayatDari}
-              max={selectedSurah.jumlahAyat}
+              max={selectedSurah?.ayat || 7}
               value={ayatSampai}
-              onChange={(e) => setAyatSampai(Math.min(selectedSurah.jumlahAyat, Math.max(ayatDari, Number(e.target.value))))}
+              onChange={(e) => setAyatSampai(Math.min(selectedSurah?.ayat || 7, Math.max(ayatDari, Number(e.target.value))))}
               className="input-field text-xs sm:text-sm py-2"
             />
           </div>
