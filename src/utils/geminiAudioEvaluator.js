@@ -51,9 +51,12 @@ export async function evaluateRecitationWithGemini({
   ayatSampai,
   targetArabicText = '',
 }) {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY
+  const apiKey =
+    localStorage.getItem('gemini_api_key') ||
+    import.meta.env.VITE_GEMINI_API_KEY
+
   if (!apiKey || apiKey === 'your-gemini-api-key-here') {
-    throw new Error('API Key Gemini belum disetting di file .env (VITE_GEMINI_API_KEY).')
+    throw new Error('API Key Gemini belum aktif di deploy ini. Silakan klik "Trigger Deploy -> Deploy site" di Netlify, atau masukkan API Key di menu Pengaturan.')
   }
 
   // Clean mime type (remove codecs=opus part if present for Gemini API)

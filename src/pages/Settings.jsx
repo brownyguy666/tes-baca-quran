@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { CRITERIA } from '../utils/scoring'
 import {
   SlidersHorizontal, User, Shield, Lock, Construction,
-  Edit2, Save, X, CheckCircle, Loader2, BadgeCheck,
+  Edit2, Save, X, CheckCircle, Loader2, BadgeCheck, Sparkles, Key,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -437,6 +437,39 @@ export default function Settings() {
           <Save className="w-4 h-4" />
           Simpan Bobot
         </button>
+      </SettingSection>
+
+      {/* ── Integrasi AI Gemini (Penilai Suara) ── */}
+      <SettingSection icon={Sparkles} title="Integrasi AI Gemini (Penilai Suara)" color="#6366f1">
+        <p className="text-xs" style={{ color: '#94a3b8' }}>
+          API Key digunakan untuk menganalisis suara tilawah siswa (tajwid, makhraj, dan kelancaran) secara otomatis.
+        </p>
+        <div className="space-y-3">
+          <div>
+            <label className="label text-xs" htmlFor="gemini-api-key-input">
+              Google Gemini API Key
+            </label>
+            <div className="relative">
+              <input
+                id="gemini-api-key-input"
+                type="password"
+                placeholder="AQ... atau AIzaSy..."
+                defaultValue={localStorage.getItem('gemini_api_key') || (import.meta.env.VITE_GEMINI_API_KEY !== 'your-gemini-api-key-here' ? import.meta.env.VITE_GEMINI_API_KEY : '')}
+                onChange={(e) => {
+                  const val = e.target.value.trim()
+                  if (val) localStorage.setItem('gemini_api_key', val)
+                  else localStorage.removeItem('gemini_api_key')
+                }}
+                className="input-field font-mono text-xs pr-10"
+              />
+              <Key className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+            </div>
+            <p className="text-[11px] text-emerald-400/80 mt-1 flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5" />
+              Tersimpan langsung di memori browser Anda (bisa langsung dipakai tanpa re-deploy).
+            </p>
+          </div>
+        </div>
       </SettingSection>
 
       {/* ── Keamanan ── */}
