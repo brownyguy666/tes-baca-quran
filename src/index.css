@@ -4,10 +4,10 @@
 
 /* ── CSS Design Tokens ────────────────────────────────────── */
 :root {
-  --bg-canvas:      #0b0f19;
-  --bg-sidebar:     #111827;
-  --bg-card:        #1e293b;
-  --bg-card-hover:  #273548;
+  --bg-canvas:      #080c14;
+  --bg-sidebar:     #0d1322;
+  --bg-card:        rgba(17, 24, 39, 0.78);
+  --bg-card-hover:  rgba(30, 41, 59, 0.88);
 
   --accent-gold:    #d4af37;
   --accent-amber:   #f59e0b;
@@ -20,9 +20,9 @@
   --text-gold-light: #fef3c7;
 
   --border-glass:     rgba(255, 255, 255, 0.08);
-  --border-gold-glow: rgba(212, 175, 55, 0.30);
-  --radius-lg:   12px;
-  --shadow-lux:  0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
+  --border-gold-glow: rgba(212, 175, 55, 0.35);
+  --radius-lg:   14px;
+  --shadow-lux:  0 12px 30px -5px rgba(0,0,0,0.55), 0 8px 10px -6px rgba(0,0,0,0.5);
   --sidebar-width: 260px;
   --bottom-nav-height: 64px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -46,8 +46,12 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  background-color: var(--bg-canvas);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: 
+    radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.045) 0%, transparent 35%),
+    radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 85%, rgba(212, 175, 55, 0.04) 0%, transparent 45%),
+    #080c14;
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -56,10 +60,10 @@ body {
 }
 
 /* ── Scrollbar ────────────────────────────────────────────── */
-::-webkit-scrollbar       { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #0b0f19; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #080c14; }
+::-webkit-scrollbar-thumb { background: #263347; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3b4d66; }
 
 /* ── Component Layer ──────────────────────────────────────── */
 @layer components {

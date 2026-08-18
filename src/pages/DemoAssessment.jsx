@@ -8,6 +8,7 @@ import { generateCertificatePDF } from '../utils/pdfGenerator'
 import {
   Sparkles, BookOpen, User, CheckCircle, Award,
   RotateCcw, Download, Loader2, ChevronDown, Check,
+  Share2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -318,18 +319,43 @@ export default function DemoAssessment() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleDownloadDemoCert}
-              disabled={isDownloading}
-              className="btn-gold flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 px-4 shadow-lg w-full sm:w-auto"
-            >
-              {isDownloading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Membuat PDF…</>
-              ) : (
-                <><Award className="w-4 h-4" /> Cetak Sertifikat Demo</>
-              )}
-            </button>
+            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = `*HASIL UJI COBA PENILAIAN BACA AL-QURAN*\n*SMP NEGERI 2 GLAGAH*\n\n` +
+                    `👤 *Nama:* ${studentName}\n` +
+                    `📖 *Surat:* QS. ${selectedSurah.latin} (${ayatDari}–${ayatSampai})\n` +
+                    `━━━━━━━━━━━━━━━━━━━━\n` +
+                    `🗣️ *Makhraj (35%):* ${evalResult.makhraj}/100\n` +
+                    `⚖️ *Tajwid (40%):* ${evalResult.tajwid}/100\n` +
+                    `🌊 *Kelancaran (25%):* ${evalResult.kelancaran}/100\n` +
+                    `🏆 *Total Skor:* ${summary.total}/100 (${summary.level})\n` +
+                    `━━━━━━━━━━━━━━━━━━━━\n` +
+                    `📝 *Catatan AI:* ${evalResult.catatan || '-'}\n\n` +
+                    `_Sistem Penilaian Tilawah SMPN 2 Glagah_`
+                  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+                }}
+                className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 px-3.5 shadow-md flex-1 sm:flex-initial"
+                title="Bagikan hasil ke WhatsApp"
+              >
+                <Share2 className="w-4 h-4 text-emerald-400" />
+                <span>Kirim WA</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadDemoCert}
+                disabled={isDownloading}
+                className="btn-gold flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 px-4 shadow-lg flex-1 sm:flex-initial"
+              >
+                {isDownloading ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Membuat PDF…</>
+                ) : (
+                  <><Award className="w-4 h-4" /> Cetak Sertifikat</>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Breakdown Score Cards */}

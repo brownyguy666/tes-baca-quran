@@ -277,26 +277,53 @@ export default function TestResult() {
         )}
       </div>
 
-      {/* PDF Download */}
+      {/* PDF Download & WhatsApp Share */}
       <div className="card p-4 md:p-6 space-y-4 animate-in">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <p className="font-semibold text-base" style={{ color: '#f8fafc' }}>Sertifikat PDF</p>
+            <p className="font-semibold text-base" style={{ color: '#f8fafc' }}>Sertifikat &amp; Laporan Nilai</p>
             <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
-              Format A4 landscape resmi berkop sekolah, siap cetak atau kirim ke murid &amp; orang tua
+              Format A4 landscape resmi berkop sekolah, siap cetak atau bagikan langsung ke nomor WhatsApp wali murid
             </p>
           </div>
-          <button
-            id="download-pdf-btn"
-            onClick={handleDownloadPDF}
-            disabled={pdfLoading}
-            className="btn-gold flex items-center justify-center gap-2 text-sm py-3 px-5 w-full sm:w-auto flex-shrink-0"
-          >
-            {pdfLoading
-              ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyiapkan PDF…</>
-              : <><Download className="w-4 h-4" /> Unduh Sertifikat</>
-            }
-          </button>
+          <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                const text = `*LAPORAN HASIL TES BACA AL-QURAN*\n*SMP NEGERI 2 GLAGAH*\n\n` +
+                  `👤 *Nama Siswa:* ${result.murid?.nama} (${result.murid?.kelas || '-'})\n` +
+                  `📖 *Materi Uji:* ${result.ayat_dibaca || `QS. Surat ke-${result.surat_nomor}`}\n` +
+                  `📅 *Tanggal Tes:* ${result.tanggal_tes}\n` +
+                  `━━━━━━━━━━━━━━━━━━━━\n` +
+                  `🗣️ *Makhraj (35%):* ${result.skor_makhraj}/100\n` +
+                  `⚖️ *Tajwid (40%):* ${result.skor_tajwid}/100\n` +
+                  `🌊 *Kelancaran (25%):* ${result.skor_kelancaran}/100\n` +
+                  `🏆 *Total Skor:* ${result.skor_total}/100\n` +
+                  `🎖️ *Predikat:* ${result.level}\n` +
+                  `━━━━━━━━━━━━━━━━━━━━\n` +
+                  `📝 *Catatan Evaluasi Guru:*\n${result.catatan || 'Bacaan telah dinilai dan memenuhi standar kompetensi.'}\n\n` +
+                  `_Sistem Penilaian Tilawah SMPN 2 Glagah_`
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+              }}
+              className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-3 px-4 flex-1 sm:flex-initial"
+              title="Kirim laporan nilai ke WhatsApp Wali Murid"
+            >
+              <FileText className="w-4 h-4 text-emerald-400" />
+              <span>Kirim ke WA</span>
+            </button>
+
+            <button
+              id="download-pdf-btn"
+              onClick={handleDownloadPDF}
+              disabled={pdfLoading}
+              className="btn-gold flex items-center justify-center gap-2 text-xs sm:text-sm py-3 px-5 flex-1 sm:flex-initial shadow-md"
+            >
+              {pdfLoading
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyiapkan PDF…</>
+                : <><Download className="w-4 h-4" /> Unduh Sertifikat</>
+              }
+            </button>
+          </div>
         </div>
       </div>
 

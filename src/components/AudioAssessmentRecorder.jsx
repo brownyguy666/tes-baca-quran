@@ -12,9 +12,12 @@ import {
   Volume2,
   HelpCircle,
   FileAudio,
+  Share2,
+  Radio,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { evaluateRecitationWithGemini } from '../utils/geminiAudioEvaluator'
+import AudioWaveVisualizer from './AudioWaveVisualizer'
 
 export default function AudioAssessmentRecorder({
   surahNo,
@@ -32,11 +35,14 @@ export default function AudioAssessmentRecorder({
   const [isPlaying, setIsPlaying] = useState(false)
   const [aiResult, setAiResult] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
+  const [activeStream, setActiveStream] = useState(null)
+  const [isQariPlaying, setIsQariPlaying] = useState(false)
 
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
   const timerIntervalRef = useRef(null)
   const audioElementRef = useRef(null)
+  const qariAudioRef = useRef(null)
 
   // Clean up on unmount
   useEffect(() => {
@@ -67,6 +73,7 @@ export default function AudioAssessmentRecorder({
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      setActiveStream(stream)
       
       // Determine supported mimeType
       let preferredMime = 'audio/webm'
@@ -90,6 +97,7 @@ export default function AudioAssessmentRecorder({
       recorder.onstop = () => {
         // Stop all audio tracks from stream to release mic icon
         stream.getTracks().forEach((track) => track.stop())
+        setActiveStream(null)
 
         const blob = new Blob(audioChunksRef.current, {
           type: preferredMime || 'audio/webm',
@@ -110,6 +118,7 @@ export default function AudioAssessmentRecorder({
       }, 1000)
     } catch (err) {
       console.error('Error accessing microphone:', err)
+      setActiveStream(null)
       let msg = err.message || 'Gagal mengakses mikrofon.'
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         msg = 'Izin mikrofon ditolak oleh browser. Silakan izinkan akses mikrofon di pengaturan browser HP/komputer Anda.'
@@ -292,6 +301,11 @@ export default function AudioAssessmentRecorder({
         </div>
       )}
 
+      {/* Audio Wave Visualizer during recording or idle */}
+      <div className="my-1">
+        <AudioWaveVisualizer stream={activeStream} isRecording={status === 'recording'} />
+      </div>
+
       {/* Main recording controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
         {/* State 1: IDLE */}
@@ -344,14 +358,22 @@ export default function AudioAssessmentRecorder({
         {/* State 3: RECORDED / EVALUATED / EVALUATING */}
         {(status === 'recorded' || status === 'evaluating' || status === 'evaluated') && audioUrl && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-3">
-            {/* Audio Preview Controls */}
-            <div className="flex items-center gap-2">
+            {/* Audio Preview Controls (Student + Qari comparison) */}
+            <div className="flex items-center gap-2 flex-wrap">
               <audio
                 ref={audioElementRef}
                 src={audioUrl}
                 onEnded={() => setIsPlaying(false)}
                 className="hidden"
               />
+              <audio
+                ref={qariAudioRef}
+                src={`https://equran.nos.wjv-1.neo.id/audio-partial/Misyari-Rasyid-Al-Afasy/${String(surahNo).padStart(3, '0')}${String(ayatDari).padStart(3, '0')}.mp3`}
+                onEnded={() => setIsQariPlaying(false)}
+                className="hidden"
+              />
+
+              {/* Play Student Audio */}
               <button
                 type="button"
                 onClick={handleTogglePlay}
@@ -363,7 +385,32 @@ export default function AudioAssessmentRecorder({
                 }}
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-slate-300" />}
-                <span>{isPlaying ? 'Jeda Audio' : 'Dengar Rekaman'}</span>
+                <span>{isPlaying ? 'Jeda Audio' : 'Dengar Siswa'}</span>
+              </button>
+
+              {/* Play Standard Qari Audio */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!qariAudioRef.current) return
+                  if (isQariPlaying) {
+                    qariAudioRef.current.pause()
+                    setIsQariPlaying(false)
+                  } else {
+                    qariAudioRef.current.play()
+                    setIsQariPlaying(true)
+                  }
+                }}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                style={{
+                  background: 'rgba(16,185,129,0.12)',
+                  border: '1px solid rgba(16,185,129,0.25)',
+                  color: '#6ee7b7',
+                }}
+                title="Dengarkan tilawah standar Qari Misyari Rasyid"
+              >
+                {isQariPlaying ? <Pause className="w-3.5 h-3.5 text-emerald-400" /> : <Radio className="w-3.5 h-3.5 text-emerald-400" />}
+                <span>{isQariPlaying ? 'Jeda Qari' : 'Qari Standar'}</span>
               </button>
 
               <span className="text-xs font-mono text-slate-400">
@@ -406,14 +453,42 @@ export default function AudioAssessmentRecorder({
               )}
 
               {status === 'evaluated' && (
-                <button
-                  type="button"
-                  onClick={handleRunAiEvaluation}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 text-slate-300 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition-colors w-full sm:w-auto"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Analisis Ulang</span>
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleRunAiEvaluation}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 text-slate-300 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition-colors"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Analisis Ulang</span>
+                  </button>
+
+                  {aiResult?.is_valid_recitation && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const total = Math.round(aiResult.skor_makhraj * 0.35 + aiResult.skor_tajwid * 0.40 + aiResult.skor_kelancaran * 0.25)
+                        const text = `*HASIL PENILAIAN BACA AL-QURAN*\n*SMP NEGERI 2 GLAGAH*\n\n` +
+                          `📖 *Surat:* QS. ${surahName} (Ayat ${ayatDari}–${ayatSampai})\n` +
+                          `━━━━━━━━━━━━━━━━━━━━\n` +
+                          `🗣️ *Makhraj (35%):* ${aiResult.skor_makhraj}/100\n` +
+                          `⚖️ *Tajwid (40%):* ${aiResult.skor_tajwid}/100\n` +
+                          `🌊 *Kelancaran (25%):* ${aiResult.skor_kelancaran}/100\n` +
+                          `🏆 *Nilai Total:* ${total}/100\n` +
+                          `━━━━━━━━━━━━━━━━━━━━\n` +
+                          `📝 *Catatan Koreksi Tajwid & Makhraj:*\n${aiResult.catatan_makhraj ? '• ' + aiResult.catatan_makhraj + '\n' : ''}${aiResult.catatan_tajwid ? '• ' + aiResult.catatan_tajwid + '\n' : ''}\n` +
+                          `💡 *Saran Latihan:* ${aiResult.saran_latihan || '-'}\n\n` +
+                          `_Sistem Penilaian Tilawah SMPN 2 Glagah_`
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+                      }}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 transition-colors"
+                      title="Kirim hasil penilaian ke WhatsApp"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Kirim ke WA</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -521,3 +596,4 @@ export default function AudioAssessmentRecorder({
     </div>
   )
 }
+
