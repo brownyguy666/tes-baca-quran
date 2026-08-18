@@ -13,6 +13,7 @@ import {
 import toast from 'react-hot-toast'
 
 import { TAJWID_CATEGORIES } from '../utils/tajwidChecklist'
+import AudioAssessmentRecorder from '../components/AudioAssessmentRecorder'
 
 // ── Step Progress Bar ─────────────────────────────────────
 function StepBar({ current }) {
@@ -996,6 +997,30 @@ export default function NewTest() {
             </span>
             Penilaian per Kriteria
           </h2>
+
+          {/* ── AI Voice Assessment Recorder (Gemini) ── */}
+          <AudioAssessmentRecorder
+            surahNo={surahNo}
+            surahName={selectedSurah?.latin || `Surat ke-${surahNo}`}
+            ayatDari={ayatDari}
+            ayatSampai={ayatSampai}
+            onApplyEvaluation={({ makhraj, tajwid, kelancaran, catatan }) => {
+              setScores((prev) => ({
+                ...prev,
+                skor_makhraj: makhraj,
+                skor_tajwid: tajwid,
+                skor_kelancaran: kelancaran,
+              }))
+              if (catatan) {
+                setExtras((prev) => ({
+                  ...prev,
+                  catatan: prev.catatan
+                    ? `${prev.catatan}\n\n[Evaluasi AI]: ${catatan}`
+                    : `[Evaluasi AI]: ${catatan}`,
+                }))
+              }
+            }}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-4">
