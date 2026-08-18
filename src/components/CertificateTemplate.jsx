@@ -98,7 +98,8 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
         boxSizing: 'border-box',
         overflow: 'hidden',
-        zIndex: -1,
+        zIndex: -999,
+        pointerEvents: 'none',
         color: '#0f172a',
       }}
     >

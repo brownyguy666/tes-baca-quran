@@ -200,7 +200,7 @@ export default function TestHistory() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl w-full mx-auto space-y-6 min-w-0">
       <Link
         to="/dashboard"
         className="inline-flex items-center gap-1.5 text-sm transition-colors animate-in"
@@ -211,29 +211,31 @@ export default function TestHistory() {
       </Link>
 
       {/* Student header */}
-      <div className="card p-6 animate-in">
-        <div className="flex items-center gap-4">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black flex-shrink-0"
-            style={{
-              background: 'linear-gradient(135deg,#6366f1,#4338ca)',
-              color: '#fff',
-            }}
-          >
-            {murid.nama.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold font-display" style={{ color: '#f8fafc' }}>
-              {murid.nama}
-            </h1>
-            <p className="text-sm mt-0.5" style={{ color: '#475569' }}>
-              Kelas {murid.kelas} · NISN {murid.nisn || '—'}
-            </p>
+      <div className="card p-4 sm:p-6 animate-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-lg sm:text-xl font-black flex-shrink-0"
+              style={{
+                background: 'linear-gradient(135deg,#6366f1,#4338ca)',
+                color: '#fff',
+              }}
+            >
+              {murid.nama.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl font-bold font-display truncate" style={{ color: '#f8fafc' }}>
+                {murid.nama}
+              </h1>
+              <p className="text-xs sm:text-sm mt-0.5 truncate" style={{ color: '#64748b' }}>
+                Kelas {murid.kelas} · NISN {murid.nisn || '—'}
+              </p>
+            </div>
           </div>
           <Link
             to={`/test/new?murid=${murid.id}`}
             id="new-test-for-student-btn"
-            className="btn-gold flex items-center gap-2 text-sm"
+            className="btn-gold flex items-center justify-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 flex-shrink-0 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" /> Tes Baru
           </Link>

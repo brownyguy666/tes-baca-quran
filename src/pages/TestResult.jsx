@@ -139,7 +139,7 @@ export default function TestResult() {
   ]
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl w-full mx-auto space-y-5 md:space-y-6 min-w-0">
       {/* Top action bar */}
       <div className="flex items-center justify-between animate-in gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -181,18 +181,18 @@ export default function TestResult() {
 
       {/* Success banner */}
       <div
-        className="card p-4 flex items-center gap-3 animate-in"
+        className="card p-3.5 sm:p-4 flex items-center gap-3 animate-in"
         style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)' }}
       >
         <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-        <p className="text-sm text-emerald-300">
+        <p className="text-xs sm:text-sm text-emerald-300">
           Hasil tes telah tersimpan dan siap dicetak sebagai sertifikat resmi.
         </p>
       </div>
 
       {/* Main result card */}
       <div
-        className="card p-6 border animate-in space-y-6"
+        className="card p-5 sm:p-8 border animate-in space-y-6"
         style={{
           background: lStyle.bg,
           borderColor: `${lStyle.border}60`,

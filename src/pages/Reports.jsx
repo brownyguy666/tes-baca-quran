@@ -183,7 +183,7 @@ export default function Reports() {
   const bestLevel = LEVEL_META.find((lv) => dist[lv.label] > 0) || LEVEL_META[4]
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl w-full mx-auto space-y-6 min-w-0">
       {/* Header (Hidden on print) */}
       <div className="animate-in print:hidden">
         <h1 className="section-title flex items-center gap-2">
@@ -321,74 +321,121 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Data table (Screen preview) */}
+          {/* Data preview on screen */}
           {data.length > 0 && (
-            <div className="card overflow-hidden animate-in print:hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                      {['No', 'Nama', 'Kelas', 'NISN', 'Tanggal', 'Makhraj', 'Tajwid', 'Kelancaran', 'Total', 'Level']
-                        .map((h) => (
-                          <th key={h}
-                              className="px-4 py-3.5 text-left text-[11px] font-black uppercase tracking-widest"
-                              style={{ color: '#334155', whiteSpace: 'nowrap' }}>
-                            {h}
-                          </th>
-                        ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.slice(0, 50).map((t, i) => (
-                      <tr key={t.id}
-                          style={{
-                            borderBottom: '1px solid rgba(255,255,255,0.04)',
-                            background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
-                          }}>
-                        <td className="px-4 py-2.5 text-xs" style={{ color: '#475569' }}>{i+1}</td>
-                        <td className="px-4 py-2.5 font-medium" style={{ color: '#cbd5e1' }}>
-                          {t.murid?.nama || '—'}
-                        </td>
-                        <td className="px-4 py-2.5 text-xs" style={{ color: '#64748b' }}>
-                          {t.murid?.kelas || '—'}
-                        </td>
-                        <td className="px-4 py-2.5 text-xs font-mono" style={{ color: '#64748b' }}>
-                          {t.murid?.nisn || '—'}
-                        </td>
-                        <td className="px-4 py-2.5 text-xs whitespace-nowrap" style={{ color: '#64748b' }}>
-                          {new Date(t.tanggal_tes).toLocaleDateString('id-ID', {
-                            day:'2-digit', month:'short', year:'numeric' })}
-                        </td>
-                        {[t.skor_makhraj, t.skor_tajwid, t.skor_kelancaran].map((s, si) => (
-                          <td key={si} className="px-4 py-2.5 text-center font-mono text-xs"
-                              style={{ color: '#94a3b8' }}>{s ?? '—'}</td>
-                        ))}
-                        <td className="px-4 py-2.5 text-center">
-                          <span className="font-black text-amber-300">{t.skor_total}</span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span
-                            className="badge-level text-[10px]"
-                            style={{
-                              background: LEVEL_META.find((l)=>l.label===t.level)?.bg || 'rgba(71,85,105,0.3)',
-                              color: LEVEL_META.find((l)=>l.label===t.level)?.color || '#94a3b8',
-                              border: `1px solid ${LEVEL_META.find((l)=>l.label===t.level)?.color || '#64748b'}40`,
-                            }}
-                          >
-                            {t.level}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {data.length > 50 && (
-                  <p className="text-xs text-center py-3" style={{ color: '#475569' }}>
-                    Menampilkan 50 dari {data.length} baris. Klik <strong>Download Excel</strong> untuk semua data.
+            <>
+              {/* ── Mobile Card List (Mobile only) ── */}
+              <div className="block md:hidden space-y-3 animate-in print:hidden">
+                {data.slice(0, 30).map((t, i) => (
+                  <div key={t.id} className="card p-4 space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-100 truncate">
+                          {i + 1}. {t.murid?.nama || '—'}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Kelas {t.murid?.kelas || '—'} {t.murid?.nisn ? `· NISN: ${t.murid.nisn}` : ''}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className="text-lg font-black text-amber-300">{t.skor_total}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-white/5">
+                      <span
+                        className="badge-level text-[10px]"
+                        style={{
+                          background: LEVEL_META.find((l) => l.label === t.level)?.bg || 'rgba(71,85,105,0.3)',
+                          color: LEVEL_META.find((l) => l.label === t.level)?.color || '#94a3b8',
+                          border: `1px solid ${LEVEL_META.find((l) => l.label === t.level)?.color || '#64748b'}40`,
+                        }}
+                      >
+                        {t.level}
+                      </span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                        <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">M:{t.skor_makhraj}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">T:{t.skor_tajwid}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">K:{t.skor_kelancaran}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {data.length > 30 && (
+                  <p className="text-xs text-center py-2 text-slate-400">
+                    Menampilkan 30 dari {data.length} hasil. Download Excel untuk data lengkap.
                   </p>
                 )}
               </div>
-            </div>
+
+              {/* ── Desktop Table (Desktop only) ── */}
+              <div className="hidden md:block card overflow-hidden animate-in print:hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                        {['No', 'Nama', 'Kelas', 'NISN', 'Tanggal', 'Makhraj', 'Tajwid', 'Kelancaran', 'Total', 'Level']
+                          .map((h) => (
+                            <th key={h}
+                                className="px-4 py-3.5 text-left text-[11px] font-black uppercase tracking-widest"
+                                style={{ color: '#334155', whiteSpace: 'nowrap' }}>
+                              {h}
+                            </th>
+                          ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.slice(0, 50).map((t, i) => (
+                        <tr key={t.id}
+                            style={{
+                              borderBottom: '1px solid rgba(255,255,255,0.04)',
+                              background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                            }}>
+                          <td className="px-4 py-2.5 text-xs" style={{ color: '#475569' }}>{i+1}</td>
+                          <td className="px-4 py-2.5 font-medium" style={{ color: '#cbd5e1' }}>
+                            {t.murid?.nama || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 text-xs" style={{ color: '#64748b' }}>
+                            {t.murid?.kelas || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 text-xs font-mono" style={{ color: '#64748b' }}>
+                            {t.murid?.nisn || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 text-xs whitespace-nowrap" style={{ color: '#64748b' }}>
+                            {new Date(t.tanggal_tes).toLocaleDateString('id-ID', {
+                              day:'2-digit', month:'short', year:'numeric' })}
+                          </td>
+                          {[t.skor_makhraj, t.skor_tajwid, t.skor_kelancaran].map((s, si) => (
+                            <td key={si} className="px-4 py-2.5 text-center font-mono text-xs"
+                                style={{ color: '#94a3b8' }}>{s ?? '—'}</td>
+                          ))}
+                          <td className="px-4 py-2.5 text-center">
+                            <span className="font-black text-amber-300">{t.skor_total}</span>
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <span
+                              className="badge-level text-[10px]"
+                              style={{
+                                background: LEVEL_META.find((l)=>l.label===t.level)?.bg || 'rgba(71,85,105,0.3)',
+                                color: LEVEL_META.find((l)=>l.label===t.level)?.color || '#94a3b8',
+                                border: `1px solid ${LEVEL_META.find((l)=>l.label===t.level)?.color || '#64748b'}40`,
+                              }}
+                            >
+                              {t.level}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {data.length > 50 && (
+                    <p className="text-xs text-center py-3" style={{ color: '#475569' }}>
+                      Menampilkan 50 dari {data.length} baris. Klik <strong>Download Excel</strong> untuk semua data.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
           )}
 
           {/* ══════════════════════════════════════════════════════════

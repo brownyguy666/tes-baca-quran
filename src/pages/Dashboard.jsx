@@ -223,22 +223,22 @@ const KPI_VARIANTS = {
 function KpiCard({ icon: Icon, label, value, sub, variant = 'indigo' }) {
   const v = KPI_VARIANTS[variant]
   return (
-    <div className={`kpi-card ${v.cls} animate-in`}>
+    <div className={`kpi-card ${v.cls} animate-in p-3 sm:p-5 flex flex-col justify-between`}>
       <div
-        className="absolute top-0 right-0 w-28 h-28 rounded-full pointer-events-none"
-        style={{ background: v.glow, filter: 'blur(28px)', transform: 'translate(30%,-30%)' }}
+        className="absolute top-0 right-0 w-24 sm:w-28 h-24 sm:h-28 rounded-full pointer-events-none"
+        style={{ background: v.glow, filter: 'blur(24px)', transform: 'translate(20%,-20%)' }}
       />
-      <div className="relative flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: '#475569' }}>
+      <div className="relative flex items-start justify-between gap-1.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-1 sm:mb-2 truncate" style={{ color: '#64748b' }}>
             {label}
           </p>
-          <p className={`text-4xl font-black ${v.valueCls}`}>{value ?? '—'}</p>
-          {sub && <p className="text-xs mt-1.5" style={{ color: '#475569' }}>{sub}</p>}
+          <p className={`text-2xl sm:text-4xl font-black ${v.valueCls} leading-none tracking-tight truncate`}>{value ?? '—'}</p>
+          {sub && <p className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 truncate hidden xs:block" style={{ color: '#475569' }}>{sub}</p>}
         </div>
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0"
              style={{ background: v.iconBg }}>
-          <Icon className="w-5 h-5" style={{ color: v.iconColor }} />
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: v.iconColor }} />
         </div>
       </div>
     </div>
@@ -416,7 +416,7 @@ export default function Dashboard() {
   const chartTotal = levelDist.reduce((s, d) => s + d.count, 0)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl w-full mx-auto space-y-5 md:space-y-8 min-w-0">
 
       {/* ── Page header ── */}
       <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -444,7 +444,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <KpiCard icon={Users}         label="Total Murid"    value={stats.total}          sub="Murid terdaftar"     variant="indigo" />
         <KpiCard icon={ClipboardList} label="Tes Hari Ini"  value={stats.tesHariIni}     sub="Penilaian dilakukan" variant="blue" />
         <KpiCard icon={TrendingUp}    label="Rata-rata"      value={stats.rataRata ?? '—'} sub="Dari semua tes"     variant="gold" />

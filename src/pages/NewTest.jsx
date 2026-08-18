@@ -168,20 +168,22 @@ function ScoreInput({ criterion, value, onChange }) {
       </div>
 
       {/* Number input */}
-      <div className="flex items-center gap-3">
-        <label className="text-xs flex-shrink-0" style={{ color: '#64748b' }}>
-          Nilai tepat:
-        </label>
-        <input
-          type="number"
-          id={`number-${criterion.key}`}
-          min="0" max="100" step="0.5"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="input-field w-24 py-1.5 text-center text-sm font-bold"
-        />
-        <span className="text-xs" style={{ color: '#475569' }}>/ 100</span>
-        <span className="text-xs font-semibold ml-auto" style={{ color: '#d4af37' }}>
+      <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap pt-1">
+        <div className="flex items-center gap-2">
+          <label className="text-xs flex-shrink-0" style={{ color: '#64748b' }}>
+            Nilai tepat:
+          </label>
+          <input
+            type="number"
+            id={`number-${criterion.key}`}
+            min="0" max="100" step="0.5"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="input-field w-20 sm:w-24 py-1.5 text-center text-sm font-bold"
+          />
+          <span className="text-xs" style={{ color: '#475569' }}>/ 100</span>
+        </div>
+        <span className="text-xs font-semibold" style={{ color: '#d4af37' }}>
           Bobot {(criterion.weight * 100).toFixed(0)}%
         </span>
       </div>
@@ -516,7 +518,7 @@ export default function NewTest() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl w-full mx-auto space-y-6 min-w-0">
       {/* Header */}
       <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>

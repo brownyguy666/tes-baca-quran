@@ -152,7 +152,7 @@ export default function QuranViewer({ surahNo, ayatDari = 1, ayatSampai = 1, sur
 
   return (
     <div
-      className="rounded-2xl p-5 space-y-4 animate-in overflow-hidden transition-all duration-300"
+      className="rounded-2xl p-3.5 sm:p-5 space-y-4 animate-in overflow-hidden w-full max-w-full transition-all duration-300"
       style={{
         background: 'linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(11,15,25,0.98) 100%)',
         border: '1px solid rgba(212,175,55,0.35)',
@@ -160,25 +160,25 @@ export default function QuranViewer({ surahNo, ayatDari = 1, ayatSampai = 1, sur
       }}
     >
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-slate-800/80">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 sm:pb-4 border-b border-slate-800/80">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{
               background: 'linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.08))',
               border: '1px solid rgba(212,175,55,0.4)',
               color: '#d4af37',
             }}
           >
-            <BookOpen className="w-5 h-5" />
+            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base" style={{ color: '#fef3c7' }}>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-bold text-sm sm:text-base text-amber-100 truncate">
                 Teks Bacaan Al-Qur'an
               </h3>
               <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
                 style={{
                   background: 'rgba(212,175,55,0.15)',
                   border: '1px solid rgba(212,175,55,0.3)',
@@ -188,14 +188,14 @@ export default function QuranViewer({ surahNo, ayatDari = 1, ayatSampai = 1, sur
                 {surahInfo ? `${surahInfo.latin} · Ayat ${ayatDari}–${ayatSampai}` : `Ayat ${ayatDari}–${ayatSampai}`}
               </span>
             </div>
-            <p className="text-xs" style={{ color: '#64748b' }}>
-              Teks langsung untuk panduan penguji &amp; siswa saat tes berlangsung
+            <p className="text-[11px] sm:text-xs truncate" style={{ color: '#64748b' }}>
+              Teks panduan penguji &amp; siswa saat tes berlangsung
             </p>
           </div>
         </div>
 
         {/* Action toolbar */}
-        <div className="flex items-center gap-1.5 flex-wrap self-end sm:self-auto">
+        <div className="flex items-center gap-1.5 flex-wrap justify-between sm:justify-end w-full sm:w-auto pt-1 sm:pt-0">
           {/* Font size control */}
           <div
             className="flex items-center rounded-xl p-1 gap-1"

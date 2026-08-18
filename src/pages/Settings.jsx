@@ -302,7 +302,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl w-full mx-auto space-y-6 min-w-0">
 
       {/* Edit Profil Modal */}
       {showEditProfil && (

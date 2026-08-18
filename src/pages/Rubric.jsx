@@ -72,18 +72,18 @@ const LEVEL_TABLE = [
 
 export default function Rubric() {
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl w-full mx-auto space-y-6 md:space-y-8 min-w-0">
       {/* Header */}
       <div className="animate-in">
         <h1 className="section-title flex items-center gap-2">
           <BookOpen className="w-6 h-6" style={{ color: '#d4af37' }} />
-          Panduan & Rubrik Penilaian
+          Panduan &amp; Rubrik Penilaian
         </h1>
-        <p className="text-sm mt-1" style={{ color: '#475569' }}>
+        <p className="text-xs sm:text-sm mt-1" style={{ color: '#475569' }}>
           Matriks indikator dan pedoman penilaian baca Al-Quran
         </p>
         <div
-          className="mt-3 px-4 py-2.5 rounded-xl inline-block text-sm"
+          className="mt-3 px-4 py-2.5 rounded-xl inline-block text-xs sm:text-sm"
           style={{
             background: 'rgba(212,175,55,0.1)',
             border: '1px solid rgba(212,175,55,0.2)',
@@ -97,30 +97,27 @@ export default function Rubric() {
 
       {/* Formula */}
       <div
-        className="card p-5 animate-in"
+        className="card p-4 sm:p-5 animate-in"
         style={{ border: '1px solid rgba(212,175,55,0.2)' }}
       >
-        <h2 className="font-bold mb-4" style={{ color: '#e2e8f0' }}>
+        <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-base" style={{ color: '#e2e8f0' }}>
           📐 Formula Penilaian
         </h2>
         <div
-          className="text-center text-lg font-mono py-4 rounded-xl mb-4"
+          className="text-center text-xs sm:text-sm md:text-base font-mono p-3 sm:p-4 rounded-xl mb-4 leading-loose flex flex-wrap items-center justify-center gap-1 sm:gap-2"
           style={{
             background: 'rgba(11,15,25,0.7)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: '#f8fafc',
           }}
         >
-          <span style={{ color: '#818cf8' }}>Makhraj</span>
-          <span style={{ color: '#475569' }}> × 35%</span>
-          {' + '}
-          <span style={{ color: '#d4af37' }}>Tajwid</span>
-          <span style={{ color: '#475569' }}> × 40%</span>
-          {' + '}
-          <span style={{ color: '#34d399' }}>Kelancaran</span>
-          <span style={{ color: '#475569' }}> × 25%</span>
-          {' = '}
-          <span className="font-black" style={{ color: '#f8fafc' }}>Skor Total</span>
+          <span className="font-bold" style={{ color: '#818cf8' }}>Makhraj (35%)</span>
+          <span style={{ color: '#475569' }}>+</span>
+          <span className="font-bold" style={{ color: '#d4af37' }}>Tajwid (40%)</span>
+          <span style={{ color: '#475569' }}>+</span>
+          <span className="font-bold" style={{ color: '#34d399' }}>Kelancaran (25%)</span>
+          <span style={{ color: '#475569' }}>=</span>
+          <span className="font-black text-amber-300">Skor Total</span>
         </div>
 
         <div className="grid grid-cols-3 gap-3">

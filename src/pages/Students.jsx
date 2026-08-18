@@ -232,7 +232,7 @@ export default function Students() {
   const to = Math.min(page * PAGE_SIZE, totalCount)
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl w-full mx-auto space-y-6 min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-in">
         <div>

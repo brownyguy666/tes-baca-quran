@@ -313,7 +313,7 @@ export default function Layout({ children }) {
 
   return (
     <div
-      className="flex h-full min-h-screen pattern-bg"
+      className="flex h-full min-h-screen pattern-bg w-full max-w-full overflow-x-hidden"
       style={{ background: 'var(--bg-canvas)' }}
     >
       {/* ── Desktop Sidebar ── */}
@@ -366,11 +366,11 @@ export default function Layout({ children }) {
 
       {/* ── Main area ── */}
       <div
-        className="flex-1 flex flex-col min-h-screen md:ml-[var(--sidebar-width)]"
+        className="flex-1 flex flex-col min-h-screen md:ml-[var(--sidebar-width)] w-full max-w-full min-w-0 overflow-x-hidden"
       >
         <Topbar onMenuClick={() => setMobileOpen(true)} />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 animate-in mobile-content-pad">
+        <main className="flex-1 w-full max-w-full min-w-0 px-3 py-3 sm:px-5 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 animate-in mobile-content-pad">
           {children}
         </main>
       </div>
