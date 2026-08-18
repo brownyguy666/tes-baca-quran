@@ -1,5 +1,6 @@
 /**
  * Utility service to evaluate student Quran recitation audio using Google Gemini API.
+ * Includes strict verification to ensure audio matches target Quranic verses and prevents hallucinations on random noises.
  */
 
 /**
@@ -20,6 +21,32 @@ export function blobToBase64(blob) {
 }
 
 /**
+ * Fetch verses text from equran.id API for accurate ground-truth comparison.
+ * @param {number|string} surahNo 
+ * @param {number|string} ayatDari 
+ * @param {number|string} ayatSampai 
+ * @returns {Promise<string>}
+ */
+async function fetchTargetVersesText(surahNo, ayatDari, ayatSampai) {
+  try {
+    const res = await fetch(`https://equran.id/api/v2/surat/${surahNo}`)
+    if (!res.ok) return ''
+    const json = await res.json()
+    const allAyat = json?.data?.ayat || []
+    const start = Number(ayatDari) || 1
+    const end = Number(ayatSampai) || start
+    const selected = allAyat.filter((a) => a.nomorAyat >= start && a.nomorAyat <= end)
+    
+    if (selected.length === 0) return ''
+    return selected
+      .map((a) => `[Ayat ${a.nomorAyat}] Arab: "${a.teksArab}" (Latin: ${a.teksLatin})`)
+      .join('\n')
+  } catch {
+    return ''
+  }
+}
+
+/**
  * Evaluate Quran recitation audio with Gemini AI.
  * 
  * @param {Object} params
@@ -29,8 +56,9 @@ export function blobToBase64(blob) {
  * @param {string} params.surahName - Name of surah (e.g. 'Al-Fatihah')
  * @param {number|string} params.ayatDari - Starting ayah number
  * @param {number|string} params.ayatSampai - Ending ayah number
- * @param {string} [params.targetArabicText] - Target Arabic verse text (if available)
+ * @param {string} [params.targetArabicText] - Target Arabic verse text (optional, fetched if omitted)
  * @returns {Promise<{
+ *   is_valid_recitation: boolean,
  *   skor_makhraj: number,
  *   skor_tajwid: number,
  *   skor_kelancaran: number,
@@ -56,38 +84,67 @@ export async function evaluateRecitationWithGemini({
     import.meta.env.VITE_GEMINI_API_KEY
 
   if (!apiKey || apiKey === 'your-gemini-api-key-here') {
-    throw new Error('API Key Gemini belum aktif di deploy ini. Silakan klik "Trigger Deploy -> Deploy site" di Netlify, atau masukkan API Key di menu Pengaturan.')
+    throw new Error('API Key Gemini belum aktif. Silakan masukkan API Key di menu Pengaturan.')
   }
 
   // Clean mime type (remove codecs=opus part if present for Gemini API)
   const cleanMimeType = mimeType.split(';')[0] || 'audio/webm'
   const base64Audio = await blobToBase64(audioBlob)
 
-  const prompt = `
-Anda adalah Penguji dan Pakar Ahli Tilawah Al-Qur'an, Tajwid, dan Makharijul Huruf bersertifikat.
-Tugas Anda adalah mendengarkan audio rekaman bacaan siswa dan memberikan evaluasi objektif.
+  // Fetch ground-truth Quranic text if not passed directly
+  let verseGroundTruth = targetArabicText
+  if (!verseGroundTruth) {
+    verseGroundTruth = await fetchTargetVersesText(surahNo, ayatDari, ayatSampai)
+  }
 
-Informasi Ujian:
+  const prompt = `
+Anda adalah Penguji Ahli Tilawah Al-Qur'an, Tajwid, dan Makharijul Huruf bersertifikat.
+Tugas Anda adalah mendengarkan audio rekaman siswa dengan SANGAT KRITIS dan mencocokkannya dengan ayat target yang diuji.
+
+Informasi Target Ujian:
 - Surat: ${surahName} (Surat ke-${surahNo})
 - Rentang Ayat: Ayat ${ayatDari} sampai ${ayatSampai}
-${targetArabicText ? `- Teks Ayat Target:\n"${targetArabicText}"` : ''}
+${verseGroundTruth ? `- Teks Ground-Truth Target:\n${verseGroundTruth}` : ''}
 
-Dengarkan rekaman audio siswa yang terlampir secara teliti, lalu nilai 3 kriteria utama (skor 0 - 100):
-1. **Makhraj (Bobot 35%)**: Ketepatan artikulasi pelafalan makhraj huruf hijaiyah dan sifat-sifat huruf (misal: membedakan Ha/Kha/Hha, Shad/Sin, 'Ain/Alif, Dhad/Dal/Zho).
-2. **Tajwid (Bobot 40%)**: Penerapan kaidah hukum tajwid seperti panjang mad (2/4/6 harakat), ghunnah pada nun/mim bertasydid, ikhfa, idgham, iqlab, dan qolqolah.
-3. **Kelancaran (Bobot 25%)**: Kelancaran tilawah, kejelasan wakaf (berhenti) dan ibtida (memulai), tidak tersendat atau berulang-ulang berlebihan.
+=== ATURAN VERIFIKASI KETAT (WAJIB DIIKUTI) ===
+1. TAHAP PERTAMA - DETEKSI KEASLIAN BACAAN:
+   Dengarkan audio dengan teliti. Apakah audio tersebut BENAR-BENAR merupakan suara seseorang yang sedang membaca Surat ${surahName} ayat ${ayatDari} sampai ${ayatSampai}?
+   
+   JIKA audio adalah:
+   - Suara obrolan / bicara biasa / suara acak / batuk / tawa / suara hening / musik / derau / nyanyian / kata-kata selain Al-Qur'an,
+   - ATAU membaca surat / ayat lain yang berbeda dari Surat ${surahName} ayat ${ayatDari}-${ayatSampai},
+   
+   MAKA ANDA HARUS MEMBERIKAN NILAI 0 DAN TIDAK BOLEH BERHALUSINASI:
+   - "is_valid_recitation": false
+   - "skor_makhraj": 0
+   - "skor_tajwid": 0
+   - "skor_kelancaran": 0
+   - "kesesuaian_ayat": "Audio tidak terdeteksi melafalkan Surat ${surahName} ayat ${ayatDari}–${ayatSampai}. Terdengar suara acak / hening / tidak sesuai."
+   - "catatan_makhraj": "Tidak ada pelafalan ayat target yang dapat dievaluasi."
+   - "catatan_tajwid": "Tidak ada kaidah tajwid yang dapat dinilai."
+   - "catatan_kelancaran": "Tidak ada tilawah Al-Qur'an yang terdeteksi."
+   - "saran_latihan": "Pastikan mikrofon aktif dan rekam bacaan Surat ${surahName} ayat ${ayatDari} sampai ${ayatSampai} dengan jelas."
+   - "ringkasan_catatan": "Rekaman tidak terdeteksi sebagai bacaan Surat ${surahName} ayat ${ayatDari}-${ayatSampai}. Harap rekam ulang bacaan siswa."
 
-Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
+2. TAHAP KEDUA - PENILAIAN REALISTIS JIKA SESUAI:
+   HANYA JIKA siswa memang benar membaca ayat target, nilai secara jujur, objektif, dan realistis:
+   - **Makhraj (0-100)**: Dengarkan artikulasi huruf hijaiyah. Kurangi nilai jika huruf tertukar (misal Ha vs Kha, Shad vs Sin, 'Ain vs Hamzah).
+   - **Tajwid (0-100)**: Periksa hukum mad (panjang 2/4/6 harakat), ghunnah, ikhfa, idgham, qolqolah.
+   - **Kelancaran (0-100)**: Periksa apakah membaca terbata-bata, mengulang kata, atau lancar.
+   - "is_valid_recitation": true
+
+Kembalikan respons HANYA berupa format JSON valid tanpa teks tambahan:
 {
+  "is_valid_recitation": <boolean true/false>,
   "skor_makhraj": <angka bulat 0-100>,
   "skor_tajwid": <angka bulat 0-100>,
   "skor_kelancaran": <angka bulat 0-100>,
-  "kesesuaian_ayat": "<Penjelasan singkat apakah ayat dibaca lengkap dan benar, atau ada kata/ayat yang terlewat>",
-  "catatan_makhraj": "<Poin evaluasi makhraj huruf yang sudah tepat atau yang perlu diperbaiki>",
-  "catatan_tajwid": "<Poin evaluasi hukum tajwid yang sudah tepat atau yang kurang tepat>",
-  "catatan_kelancaran": "<Poin evaluasi kelancaran dan pemenggalan nafas/wakaf>",
-  "saran_latihan": "<Saran konstruktif dan memotivasi untuk siswa>",
-  "ringkasan_catatan": "<Rangkuman singkat dan padat 2-3 kalimat berbahasa Indonesia untuk dimasukkan langsung ke catatan raport/guru>"
+  "kesesuaian_ayat": "<Penjelasan apakah ayat dibaca lengkap sesuai target>",
+  "catatan_makhraj": "<Evaluasi artikulasi huruf>",
+  "catatan_tajwid": "<Evaluasi hukum tajwid>",
+  "catatan_kelancaran": "<Evaluasi kelancaran tilawah>",
+  "saran_latihan": "<Saran singkat untuk peningkatan>",
+  "ringkasan_catatan": "<Rangkuman 1-2 kalimat untuk catatan guru>"
 }
 `.trim()
 
@@ -117,7 +174,7 @@ Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
     ],
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.2,
+      temperature: 0.1,
     },
   }
 
@@ -153,6 +210,7 @@ Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
   if (!data) {
     throw lastError || new Error('Gagal menghubungi layanan Gemini AI.')
   }
+
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
 
   if (!rawText) {
@@ -160,13 +218,15 @@ Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
   }
 
   try {
-    // Parse JSON
     const parsed = JSON.parse(rawText)
+    const isValid = parsed.is_valid_recitation !== false
+
     return {
-      skor_makhraj: Math.min(100, Math.max(0, Number(parsed.skor_makhraj) || 75)),
-      skor_tajwid: Math.min(100, Math.max(0, Number(parsed.skor_tajwid) || 75)),
-      skor_kelancaran: Math.min(100, Math.max(0, Number(parsed.skor_kelancaran) || 75)),
-      kesesuaian_ayat: parsed.kesesuaian_ayat || 'Sesuai dengan ayat target',
+      is_valid_recitation: isValid,
+      skor_makhraj: isValid ? Math.min(100, Math.max(0, Number(parsed.skor_makhraj) || 0)) : 0,
+      skor_tajwid: isValid ? Math.min(100, Math.max(0, Number(parsed.skor_tajwid) || 0)) : 0,
+      skor_kelancaran: isValid ? Math.min(100, Math.max(0, Number(parsed.skor_kelancaran) || 0)) : 0,
+      kesesuaian_ayat: parsed.kesesuaian_ayat || '',
       catatan_makhraj: parsed.catatan_makhraj || '',
       catatan_tajwid: parsed.catatan_tajwid || '',
       catatan_kelancaran: parsed.catatan_kelancaran || '',

@@ -178,17 +178,21 @@ export default function AudioAssessmentRecorder({
 
       setAiResult(result)
       setStatus('evaluated')
-      toast.success('Analisis AI Selesai! 🎉 Nilai & catatan siap diterapkan.', { id: 'evaluating-ai' })
 
-      // Automatically apply to parent form
-      if (onApplyEvaluation) {
-        onApplyEvaluation({
-          makhraj: result.skor_makhraj,
-          tajwid: result.skor_tajwid,
-          kelancaran: result.skor_kelancaran,
-          catatan: result.ringkasan_catatan,
-          detailedNotes: result,
-        })
+      if (!result.is_valid_recitation) {
+        toast.error('Audio tidak terdeteksi sebagai bacaan ayat yang diuji! ⚠️', { id: 'evaluating-ai' })
+      } else {
+        toast.success('Analisis AI Selesai! 🎉 Nilai & catatan otomatis diterapkan.', { id: 'evaluating-ai' })
+        // Automatically apply to parent form only if recitation is valid
+        if (onApplyEvaluation) {
+          onApplyEvaluation({
+            makhraj: result.skor_makhraj,
+            tajwid: result.skor_tajwid,
+            kelancaran: result.skor_kelancaran,
+            catatan: result.ringkasan_catatan,
+            detailedNotes: result,
+          })
+        }
       }
     } catch (err) {
       console.error('AI Evaluation error:', err)
@@ -421,74 +425,97 @@ export default function AudioAssessmentRecorder({
         <div
           className="p-3.5 sm:p-4 rounded-xl space-y-3 animate-in"
           style={{
-            background: 'rgba(15,23,42,0.85)',
-            border: '1px solid rgba(212,175,55,0.3)',
+            background: !aiResult.is_valid_recitation ? 'rgba(239,68,68,0.1)' : 'rgba(15,23,42,0.85)',
+            border: `1px solid ${!aiResult.is_valid_recitation ? 'rgba(239,68,68,0.35)' : 'rgba(212,175,55,0.3)'}`,
           }}
         >
-          {/* Score highlights */}
-          <div className="grid grid-cols-3 gap-2">
-            <div
-              className="p-2.5 rounded-lg text-center"
-              style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}
-            >
-              <p className="text-[10px] uppercase font-bold tracking-wider text-indigo-300">Makhraj</p>
-              <p className="text-xl sm:text-2xl font-black text-indigo-400 mt-0.5">
-                {aiResult.skor_makhraj}
+          {!aiResult.is_valid_recitation ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>Audio Tidak Sesuai dengan Ayat yang Diuji</span>
+              </div>
+              <p className="text-xs text-rose-200/90 leading-relaxed">
+                {aiResult.kesesuaian_ayat || 'Suara yang terekam bukan merupakan bacaan ayat yang ditentukan.'}
+              </p>
+              {aiResult.saran_latihan && (
+                <p className="text-xs text-slate-300">
+                  <span className="font-semibold text-amber-300">Saran: </span>
+                  {aiResult.saran_latihan}
+                </p>
+              )}
+              <p className="text-[11px] text-slate-400 pt-1 border-t border-rose-500/20">
+                ⚠️ Nilai form tidak diubah. Silakan tekan tombol <strong>"Rekam Ulang"</strong> dan minta siswa membaca ayat target dengan jelas.
               </p>
             </div>
+          ) : (
+            <>
+              {/* Score highlights */}
+              <div className="grid grid-cols-3 gap-2">
+                <div
+                  className="p-2.5 rounded-lg text-center"
+                  style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}
+                >
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-indigo-300">Makhraj</p>
+                  <p className="text-xl sm:text-2xl font-black text-indigo-400 mt-0.5">
+                    {aiResult.skor_makhraj}
+                  </p>
+                </div>
 
-            <div
-              className="p-2.5 rounded-lg text-center"
-              style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.25)' }}
-            >
-              <p className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Tajwid</p>
-              <p className="text-xl sm:text-2xl font-black text-amber-400 mt-0.5">
-                {aiResult.skor_tajwid}
-              </p>
-            </div>
+                <div
+                  className="p-2.5 rounded-lg text-center"
+                  style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.25)' }}
+                >
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Tajwid</p>
+                  <p className="text-xl sm:text-2xl font-black text-amber-400 mt-0.5">
+                    {aiResult.skor_tajwid}
+                  </p>
+                </div>
 
-            <div
-              className="p-2.5 rounded-lg text-center"
-              style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
-            >
-              <p className="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Kelancaran</p>
-              <p className="text-xl sm:text-2xl font-black text-emerald-400 mt-0.5">
-                {aiResult.skor_kelancaran}
-              </p>
-            </div>
-          </div>
+                <div
+                  className="p-2.5 rounded-lg text-center"
+                  style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
+                >
+                  <p className="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Kelancaran</p>
+                  <p className="text-xl sm:text-2xl font-black text-emerald-400 mt-0.5">
+                    {aiResult.skor_kelancaran}
+                  </p>
+                </div>
+              </div>
 
-          {/* Detailed findings */}
-          <div className="space-y-1.5 text-xs">
-            {aiResult.kesesuaian_ayat && (
-              <p className="text-slate-300">
-                <span className="font-semibold text-amber-200">📖 Ayat: </span>
-                {aiResult.kesesuaian_ayat}
-              </p>
-            )}
-            {aiResult.catatan_makhraj && (
-              <p className="text-slate-300">
-                <span className="font-semibold text-indigo-300">🗣️ Makhraj: </span>
-                {aiResult.catatan_makhraj}
-              </p>
-            )}
-            {aiResult.catatan_tajwid && (
-              <p className="text-slate-300">
-                <span className="font-semibold text-amber-300">⚖️ Tajwid: </span>
-                {aiResult.catatan_tajwid}
-              </p>
-            )}
-            {aiResult.saran_latihan && (
-              <p className="text-emerald-300">
-                <span className="font-semibold text-emerald-400">💡 Saran: </span>
-                {aiResult.saran_latihan}
-              </p>
-            )}
-          </div>
+              {/* Detailed findings */}
+              <div className="space-y-1.5 text-xs">
+                {aiResult.kesesuaian_ayat && (
+                  <p className="text-slate-300">
+                    <span className="font-semibold text-amber-200">📖 Ayat: </span>
+                    {aiResult.kesesuaian_ayat}
+                  </p>
+                )}
+                {aiResult.catatan_makhraj && (
+                  <p className="text-slate-300">
+                    <span className="font-semibold text-indigo-300">🗣️ Makhraj: </span>
+                    {aiResult.catatan_makhraj}
+                  </p>
+                )}
+                {aiResult.catatan_tajwid && (
+                  <p className="text-slate-300">
+                    <span className="font-semibold text-amber-300">⚖️ Tajwid: </span>
+                    {aiResult.catatan_tajwid}
+                  </p>
+                )}
+                {aiResult.saran_latihan && (
+                  <p className="text-emerald-300">
+                    <span className="font-semibold text-emerald-400">💡 Saran: </span>
+                    {aiResult.saran_latihan}
+                  </p>
+                )}
+              </div>
 
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-            <span>✨ Nilai & catatan di bawah telah otomatis diperbarui oleh AI. Guru dapat menyesuaikan jika diperlukan.</span>
-          </div>
+              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                <span>✨ Nilai & catatan di bawah telah otomatis diperbarui oleh AI. Guru dapat menyesuaikan jika diperlukan.</span>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
