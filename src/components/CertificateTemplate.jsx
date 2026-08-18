@@ -42,41 +42,6 @@ function parseNotes(catatanStr, isPassed) {
 }
 
 /**
- * Official School Stamp (Blue Ink Circular Seal)
- */
-function OfficialStamp() {
-  return (
-    <div
-      style={{
-        width: '92px',
-        height: '92px',
-        borderRadius: '50%',
-        border: '2.5px dashed #1d4ed8',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxSizing: 'border-box',
-        backgroundColor: 'rgba(239, 246, 255, 0.45)',
-        transform: 'rotate(-8deg)',
-      }}
-    >
-      <span style={{ fontSize: '6px', fontWeight: 900, color: '#1d4ed8', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-        PEMKAB BANYUWANGI
-      </span>
-      <img
-        src="/logo-smpn2glagah.png"
-        alt="Stamp"
-        style={{ width: '32px', height: '32px', objectFit: 'contain', margin: '1px 0' }}
-      />
-      <span style={{ fontSize: '6px', fontWeight: 900, color: '#1d4ed8', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-        SMPN 2 GLAGAH
-      </span>
-    </div>
-  )
-}
-
-/**
  * CertificateTemplate (Custom PowerPoint Template Engine)
  *
  * Uses the exact high-res PowerPoint design as the pixel-perfect background canvas,
@@ -99,6 +64,9 @@ export default function CertificateTemplate({ result, id = 'certificate-template
   const paddedNo = String((numericSeed % 900) + 100).padStart(3, '0')
   const certNumber = `421.3/BQ-${paddedNo}/SMPN2GLG/${yearStr}`
   const formattedDate = formatDate(result.tanggal_tes)
+
+  // Clean ayat dibaca string
+  const cleanAyat = (result.ayat_dibaca || '').replace(/^📖\s*/, '')
 
   return (
     <div
@@ -134,21 +102,21 @@ export default function CertificateTemplate({ result, id = 'certificate-template
       />
 
       {/* ══════════════════════════════════════════════════════════
-          DYNAMIC FIELDS OVERLAY (EXACT PPT COORDINATES)
+          DYNAMIC FIELDS OVERLAY (PRECISE PPT COORDINATES)
           ══════════════════════════════════════════════════════════ */}
 
-      {/* 1. Nomor Sertifikat (Top Left Box) */}
+      {/* 1. Nomor Sertifikat (Kotak Kiri Atas) */}
       <div
         style={{
           position: 'absolute',
           left: '9.7%',
-          top: '10.3%',
-          width: '18.6%',
+          top: '10.0%',
+          width: '18.4%',
           height: '4.2%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '11px',
+          fontSize: '11.5px',
           fontWeight: 800,
           color: '#1e293b',
           fontFamily: 'monospace',
@@ -158,12 +126,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {certNumber}
       </div>
 
-      {/* 2. Tanggal Terbit (Top Right Box) */}
+      {/* 2. Tanggal Terbit (Kotak Kanan Atas) */}
       <div
         style={{
           position: 'absolute',
-          left: '73.4%',
-          top: '10.3%',
+          left: '73.3%',
+          top: '10.0%',
           width: '17.2%',
           height: '4.2%',
           display: 'flex',
@@ -177,14 +145,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {formattedDate}
       </div>
 
-      {/* 3. Tanggal di bawah kotak Tanggal Terbit ("Banyuwangi, [tanggal]") */}
+      {/* 3. Tanggal di sebelah "Banyuwangi, [tanggal]" */}
       <div
         style={{
           position: 'absolute',
-          left: '80.6%',
-          top: '15.6%',
-          width: '10.0%',
-          height: '2.2%',
+          left: '81.2%',
+          top: '15.2%',
+          width: '10.5%',
+          height: '2.0%',
           display: 'flex',
           alignItems: 'center',
           fontSize: '9.5px',
@@ -200,16 +168,16 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         style={{
           position: 'absolute',
           left: '35.0%',
-          top: '40.6%',
+          top: '39.8%',
           width: '42.5%',
-          height: '3.2%',
+          height: '3.0%',
           display: 'flex',
           alignItems: 'center',
           fontSize: '16px',
           fontWeight: 900,
           color: '#14532d',
           fontFamily: "'Playfair Display', Georgia, serif",
-          letterSpacing: '0.02em',
+          letterSpacing: '0.03em',
           textTransform: 'uppercase',
         }}
       >
@@ -221,12 +189,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         style={{
           position: 'absolute',
           left: '35.0%',
-          top: '43.8%',
+          top: '43.3%',
           width: '20.0%',
-          height: '2.8%',
+          height: '2.6%',
           display: 'flex',
           alignItems: 'center',
-          fontSize: '13px',
+          fontSize: '13.5px',
           fontWeight: 800,
           color: '#0f172a',
         }}
@@ -239,12 +207,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         style={{
           position: 'absolute',
           left: '63.2%',
-          top: '43.8%',
+          top: '43.3%',
           width: '14.5%',
-          height: '2.8%',
+          height: '2.6%',
           display: 'flex',
           alignItems: 'center',
-          fontSize: '13px',
+          fontSize: '13.5px',
           fontWeight: 800,
           color: '#0f172a',
           fontFamily: 'monospace',
@@ -258,9 +226,9 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         style={{
           position: 'absolute',
           left: '35.0%',
-          top: '50.1%',
+          top: '49.6%',
           width: '42.5%',
-          height: '2.8%',
+          height: '2.6%',
           display: 'flex',
           alignItems: 'center',
           fontSize: '13.5px',
@@ -269,18 +237,18 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           fontStyle: 'italic',
         }}
       >
-        📖 {result.ayat_dibaca || 'Al-Qur\'an'}
+        {cleanAyat ? `QS. ${cleanAyat}` : 'Al-Qur\'an'}
       </div>
 
-      {/* 8. RINCIAN SKOR (Tabel Kiri) */}
-      {/* Row 1: Makharijul Huruf */}
+      {/* 8. RINCIAN SKOR (Tabel Kiri) - Presisi di dalam masing-masing baris */}
+      {/* Baris 1: Makharijul Huruf */}
       <div
         style={{
           position: 'absolute',
           left: '46.5%',
-          top: '59.7%',
-          width: '8.2%',
-          height: '2.6%',
+          top: '57.8%',
+          width: '8.0%',
+          height: '2.5%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -293,14 +261,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {result.skor_makhraj ?? '-'}
       </div>
 
-      {/* Row 2: Kaidah Tajwid */}
+      {/* Baris 2: Kaidah Tajwid */}
       <div
         style={{
           position: 'absolute',
           left: '46.5%',
-          top: '62.2%',
-          width: '8.2%',
-          height: '2.6%',
+          top: '60.5%',
+          width: '8.0%',
+          height: '2.5%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -313,14 +281,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {result.skor_tajwid ?? '-'}
       </div>
 
-      {/* Row 3: Kelancaran & Adab */}
+      {/* Baris 3: Kelancaran & Adab */}
       <div
         style={{
           position: 'absolute',
           left: '46.5%',
-          top: '64.7%',
-          width: '8.2%',
-          height: '2.6%',
+          top: '63.2%',
+          width: '8.0%',
+          height: '2.5%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -333,18 +301,18 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {result.skor_kelancaran ?? '-'}
       </div>
 
-      {/* Row 4: TOTAL SKOR AKHIR */}
+      {/* Baris 4: TOTAL SKOR AKHIR */}
       <div
         style={{
           position: 'absolute',
           left: '46.5%',
-          top: '67.2%',
-          width: '8.2%',
-          height: '2.6%',
+          top: '65.9%',
+          width: '8.0%',
+          height: '2.5%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '16px',
+          fontSize: '15px',
           fontWeight: 900,
           fontFamily: 'monospace',
           color: isPassed ? '#14532d' : '#dc2626',
@@ -353,16 +321,16 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {totalScore}
       </div>
 
-      {/* 9. PREDIKAT / LEVEL CAPAIAN CHECKBOXES (Kotak Kanan) */}
+      {/* 9. PREDIKAT / LEVEL CAPAIAN CHECKBOXES (Kotak Kanan) - Tepat di dalam Kotak ☐ */}
       {/* Box 1: Mumtaz (91-100) */}
       {activeLevel === 'mumtaz' && (
         <div
           style={{
             position: 'absolute',
             left: '57.65%',
-            top: '58.0%',
-            width: '13px',
-            height: '13px',
+            top: '57.9%',
+            width: '15px',
+            height: '15px',
             backgroundColor: '#d97706',
             borderRadius: '2px',
             display: 'flex',
@@ -385,9 +353,9 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           style={{
             position: 'absolute',
             left: '57.65%',
-            top: '60.5%',
-            width: '13px',
-            height: '13px',
+            top: '60.4%',
+            width: '15px',
+            height: '15px',
             backgroundColor: '#16a34a',
             borderRadius: '2px',
             display: 'flex',
@@ -410,9 +378,9 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           style={{
             position: 'absolute',
             left: '57.65%',
-            top: '63.0%',
-            width: '13px',
-            height: '13px',
+            top: '62.9%',
+            width: '15px',
+            height: '15px',
             backgroundColor: '#ea580c',
             borderRadius: '2px',
             display: 'flex',
@@ -436,8 +404,8 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             position: 'absolute',
             left: '57.65%',
             top: '65.4%',
-            width: '13px',
-            height: '13px',
+            width: '15px',
+            height: '15px',
             backgroundColor: '#2563eb',
             borderRadius: '2px',
             display: 'flex',
@@ -460,9 +428,9 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           style={{
             position: 'absolute',
             left: '57.65%',
-            top: '67.8%',
-            width: '13px',
-            height: '13px',
+            top: '67.85%',
+            width: '15px',
+            height: '15px',
             backgroundColor: '#dc2626',
             borderRadius: '2px',
             display: 'flex',
@@ -486,11 +454,11 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           left: '21.8%',
           top: '74.2%',
           width: '56.4%',
-          height: '4.8%',
+          height: '4.4%',
           display: 'flex',
           alignItems: 'flex-start',
           fontSize: '11px',
-          lineHeight: 1.4,
+          lineHeight: 1.35,
           fontWeight: 600,
           fontStyle: 'italic',
           color: isPassed ? '#1e293b' : '#991b1b',
@@ -499,30 +467,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         {notesText}
       </div>
 
-      {/* 11. STEMPEL RESMI SEKOLAH (Lingkaran Bawah Kiri) */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '17.0%',
-          top: '82.0%',
-          width: '92px',
-          height: '92px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <OfficialStamp />
-      </div>
-
-      {/* 12. NAMA GURU PENGUJI / PAI (Garis Bawah Kanan) */}
+      {/* 11. NAMA GURU PENGUJI / PAI (Tepat di atas garis kanan bawah) */}
       <div
         style={{
           position: 'absolute',
           left: '58.6%',
-          top: '90.2%',
+          top: '87.2%',
           width: '22.0%',
-          height: '3.0%',
+          height: '2.8%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
