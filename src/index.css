@@ -24,6 +24,8 @@
   --radius-lg:   12px;
   --shadow-lux:  0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
   --sidebar-width: 260px;
+  --bottom-nav-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   color-scheme: dark;
 }
@@ -238,6 +240,61 @@ body {
     color: #334155;
     letter-spacing: 0.13em;
   }
+
+  /* ── Bottom Nav (mobile) ─── */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-40 flex md:hidden;
+    height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: rgba(11,15,25,0.97);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.4);
+  }
+  .bottom-nav-item {
+    @apply flex flex-1 flex-col items-center justify-center gap-0.5
+           text-[10px] font-semibold transition-all duration-200
+           active:scale-90 cursor-pointer select-none;
+    color: #475569;
+    min-height: 44px;
+  }
+  .bottom-nav-item.active {
+    color: #d4af37;
+  }
+  .bottom-nav-item svg {
+    @apply transition-transform duration-200;
+    width: 22px;
+    height: 22px;
+  }
+  .bottom-nav-item.active svg {
+    filter: drop-shadow(0 0 6px rgba(212,175,55,0.7));
+    transform: translateY(-2px);
+  }
+
+  /* ── Mobile content padding ─── */
+  .mobile-content-pad {
+    @apply pb-0 md:pb-0;
+  }
+  @media (max-width: 767px) {
+    .mobile-content-pad {
+      padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 8px);
+    }
+  }
+
+  /* ── Visibility helpers ─── */
+  .mobile-only  { @apply block md:hidden; }
+  .desktop-only { @apply hidden md:block; }
+
+  /* ── Touch-friendly FAB ─── */
+  .fab {
+    @apply fixed right-4 z-30 flex md:hidden items-center justify-center
+           rounded-full shadow-2xl transition-all duration-200 active:scale-90;
+    bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 12px);
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    box-shadow: 0 0 24px rgba(99,102,241,0.5), 0 4px 12px rgba(0,0,0,0.4);
+  }
 }
 
 /* ── Background pattern ──────────────────────────────────── */
@@ -283,27 +340,76 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #d4af37;
   border: 2px solid #f59e0b;
   box-shadow: 0 0 10px rgba(212,175,55,0.65);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
+  /* Larger touch target on mobile */
+  touch-action: none;
 }
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.25);
+input[type="range"]::-webkit-slider-thumb:hover,
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.2);
   box-shadow: 0 0 18px rgba(212,175,55,0.85);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #d4af37;
   border: 2px solid #f59e0b;
   cursor: pointer;
 }
+@media (max-width: 767px) {
+  input[type="range"] {
+    height: 8px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 34px;
+    height: 34px;
+  }
+}
 
 /* ── Animate utility ──────────────────────────────────────── */
 .animate-in { animation: slideUp 0.35s ease-out; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mobile table → cards ─────────────────────────────────── */
+@media (max-width: 767px) {
+  .table-to-cards thead { display: none; }
+  .table-to-cards tbody tr {
+    display: block;
+    background: rgba(30,41,59,0.75);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+  }
+  .table-to-cards tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border: none;
+    font-size: 13px;
+  }
+  .table-to-cards tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 8px;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+}

@@ -419,18 +419,19 @@ export default function Dashboard() {
     <div className="max-w-7xl mx-auto space-y-8">
 
       {/* ── Page header ── */}
-      <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="animate-in flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <div className="text-[10px] font-arabic mb-1" style={{ color: '#334155' }}>الحمد لله</div>
-          <h1 className="section-title text-2xl flex items-center gap-2">
-            <BookOpen className="w-6 h-6" style={{ color: '#d4af37' }} />
+          <div className="text-[10px] font-arabic mb-1 hidden sm:block" style={{ color: '#334155' }}>الحمد لله</div>
+          <h1 className="section-title text-xl md:text-2xl flex items-center gap-2">
+            <BookOpen className="w-5 h-5 md:w-6 md:h-6" style={{ color: '#d4af37' }} />
             Dashboard
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#475569' }}>
+          <p className="text-xs md:text-sm mt-0.5" style={{ color: '#475569' }}>
             Pantau aktivitas dan kemajuan penilaian
           </p>
         </div>
-        <div className="flex gap-3">
+        {/* Desktop action buttons — on mobile these are in bottom nav */}
+        <div className="hidden sm:flex gap-3">
           <Link to="/students" id="manage-students-btn"
                 className="btn-secondary flex items-center gap-2">
             <Users className="w-4 h-4" /> Kelola Murid
@@ -443,26 +444,52 @@ export default function Dashboard() {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <KpiCard icon={Users}       label="Total Murid"    value={stats.total}         sub="Murid terdaftar"     variant="indigo" />
-        <KpiCard icon={ClipboardList} label="Tes Hari Ini" value={stats.tesHariIni}    sub="Penilaian dilakukan" variant="blue" />
-        <KpiCard icon={TrendingUp}  label="Rata-rata Skor" value={stats.rataRata ?? '—'} sub="Dari semua tes"   variant="gold" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+        <KpiCard icon={Users}         label="Total Murid"    value={stats.total}          sub="Murid terdaftar"     variant="indigo" />
+        <KpiCard icon={ClipboardList} label="Tes Hari Ini"  value={stats.tesHariIni}     sub="Penilaian dilakukan" variant="blue" />
+        <KpiCard icon={TrendingUp}    label="Rata-rata"      value={stats.rataRata ?? '—'} sub="Dari semua tes"     variant="gold" />
       </div>
 
       {/* ── Chart + Distribusi Level ── */}
       {chartTotal > 0 && (
-        <div className="card p-6 animate-in">
-          <h2 className="section-title flex items-center gap-2 mb-6">
-            <PieChart className="w-5 h-5" style={{ color: '#d4af37' }} />
+        <div className="card p-4 md:p-6 animate-in">
+          <h2 className="section-title text-base md:text-xl flex items-center gap-2 mb-4 md:mb-6">
+            <PieChart className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#d4af37' }} />
             Distribusi Kondisi Murid
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* Donut chart */}
+          {/* Mobile: only show level cards in 2x grid, no donut chart */}
+          <div className="block md:hidden">
+            <div className="grid grid-cols-3 gap-2">
+              {levelDist.map((lv) => {
+                if (lv.count === 0) return null
+                const pct = ((lv.count / chartTotal) * 100).toFixed(1)
+                return (
+                  <div
+                    key={lv.label}
+                    className="rounded-xl p-2.5 text-center"
+                    style={{
+                      background: `${lv.color}12`,
+                      border: `1px solid ${lv.color}30`,
+                    }}
+                  >
+                    <div className="text-lg mb-0.5">{lv.emoji}</div>
+                    <p className="text-[10px] font-bold leading-tight" style={{ color: lv.color }}>
+                      {lv.label.split(' ')[0]}
+                    </p>
+                    <p className="text-xl font-black mt-0.5" style={{ color: lv.color }}>
+                      {lv.count}
+                    </p>
+                    <p className="text-[10px]" style={{ color: '#475569' }}>{pct}%</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          {/* Desktop: donut chart + full legend */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="flex justify-center">
               <DonutChart segments={levelDist} total={chartTotal} />
             </div>
-
-            {/* Summary cards per level */}
             <div className="grid grid-cols-2 gap-3">
               {levelDist.map((lv) => {
                 if (lv.count === 0) return null
@@ -496,9 +523,9 @@ export default function Dashboard() {
 
       {/* ── Search + Student Grid ── */}
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-          <h2 className="section-title flex items-center gap-2">
-            <Users className="w-5 h-5" style={{ color: '#d4af37' }} />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 className="section-title text-base md:text-xl flex items-center gap-2">
+            <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#d4af37' }} />
             Daftar Murid
           </h2>
           <div className="relative w-full sm:w-72">
@@ -534,7 +561,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
               {students.map((murid) => (
                 <StudentCard key={murid.id} murid={murid} lastTest={lastTests[murid.id]} />
               ))}

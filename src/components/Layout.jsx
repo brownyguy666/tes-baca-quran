@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, ClipboardList, LogOut,
   Menu, X, BookOpen, ChevronRight, FileText,
   BarChart3, SlidersHorizontal, GraduationCap, Tv,
+  History,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
 
-// ── Navigation Groups ─────────────────────────────────────
+// ── Navigation Groups (sidebar desktop) ───────────────────────
 const NAV_GROUPS = [
   {
     label: 'MAIN MENU',
@@ -29,13 +30,22 @@ const NAV_GROUPS = [
   {
     label: 'SISTEM & ACUAN',
     items: [
-      { to: '/rubric',   icon: BookOpen,         label: 'Panduan & Rubrik' },
+      { to: '/rubric',   icon: BookOpen,          label: 'Panduan & Rubrik' },
       { to: '/settings', icon: SlidersHorizontal, label: 'Pengaturan System' },
     ],
   },
 ]
 
-// ── Topbar ────────────────────────────────────────────────
+// ── Bottom Nav Items (mobile) — 5 paling penting ──────────────
+const BOTTOM_NAV_ITEMS = [
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Beranda' },
+  { to: '/test/new',  icon: ClipboardList,   label: 'Tes Baru' },
+  { to: '/students',  icon: Users,           label: 'Murid' },
+  { to: '/history',   icon: History,         label: 'Riwayat' },
+  { to: '/settings',  icon: SlidersHorizontal, label: 'Setelan' },
+]
+
+// ── Topbar ────────────────────────────────────────────────────
 function Topbar({ onMenuClick }) {
   const { profile } = useAuth()
   const hour = new Date().getHours()
@@ -45,10 +55,10 @@ function Topbar({ onMenuClick }) {
 
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between px-5 py-3"
+      className="sticky top-0 z-20 flex items-center justify-between px-4 md:px-5 py-3"
       style={{
-        background: 'rgba(11,15,25,0.88)',
-        backdropFilter: 'blur(14px)',
+        background: 'rgba(11,15,25,0.92)',
+        backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         height: '60px',
       }}
@@ -59,6 +69,7 @@ function Topbar({ onMenuClick }) {
         onClick={onMenuClick}
         className="md:hidden p-2 rounded-lg transition-colors"
         style={{ background: 'rgba(30,41,59,0.8)', color: '#94a3b8' }}
+        aria-label="Buka menu"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -120,7 +131,7 @@ function Topbar({ onMenuClick }) {
   )
 }
 
-// ── Sidebar Content ───────────────────────────────────────
+// ── Sidebar Content (desktop + mobile drawer) ─────────────────
 function SidebarContent({ onClose }) {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
@@ -272,7 +283,33 @@ function SidebarContent({ onClose }) {
   )
 }
 
-// ── Layout ────────────────────────────────────────────────
+// ── Bottom Navigation Bar (Mobile Only) ───────────────────────
+function BottomNav() {
+  const location = useLocation()
+
+  const isActive = (to) => {
+    if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/'
+    return location.pathname.startsWith(to)
+  }
+
+  return (
+    <nav className="bottom-nav" aria-label="Navigasi utama mobile">
+      {BOTTOM_NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+        <NavLink
+          key={to}
+          to={to}
+          className={() => `bottom-nav-item ${isActive(to) ? 'active' : ''}`}
+          aria-label={label}
+        >
+          <Icon />
+          <span>{label}</span>
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
+
+// ── Layout ────────────────────────────────────────────────────
 export default function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -303,7 +340,7 @@ export default function Layout({ children }) {
         />
       )}
 
-      {/* ── Mobile Sidebar ── */}
+      {/* ── Mobile Sidebar Drawer ── */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 md:hidden
@@ -321,6 +358,7 @@ export default function Layout({ children }) {
             onClick={() => setMobileOpen(false)}
             className="p-1.5 rounded-lg transition-colors"
             style={{ background: 'rgba(30,41,59,0.8)', color: '#94a3b8' }}
+            aria-label="Tutup menu"
           >
             <X className="w-4 h-4" />
           </button>
@@ -330,16 +368,17 @@ export default function Layout({ children }) {
 
       {/* ── Main area ── */}
       <div
-        className="flex-1 flex flex-col min-h-screen"
-        style={{ marginLeft: 'var(--sidebar-width)' }}
+        className="flex-1 flex flex-col min-h-screen md:ml-[var(--sidebar-width)]"
       >
-        {/* Desktop hidden via CSS, always rendered but md:ml applied to content */}
         <Topbar onMenuClick={() => setMobileOpen(true)} />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 animate-in">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 animate-in mobile-content-pad">
           {children}
         </main>
       </div>
+
+      {/* ── Bottom Navigation Bar (mobile only) ── */}
+      <BottomNav />
     </div>
   )
 }

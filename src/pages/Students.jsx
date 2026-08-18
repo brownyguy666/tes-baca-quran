@@ -234,20 +234,21 @@ export default function Students() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-in">
         <div>
           <h1 className="section-title flex items-center gap-2">
-            <Users className="w-6 h-6 text-gold-400" />
+            <Users className="w-5 h-5 md:w-6 md:h-6" style={{ color: '#d4af37' }} />
             Data Murid
           </h1>
-          <p className="text-sm text-islamic-400 mt-1">
+          <p className="text-xs md:text-sm mt-0.5" style={{ color: '#475569' }}>
             {totalCount} murid terdaftar
           </p>
         </div>
+        {/* Desktop add button — mobile uses FAB */}
         <button
           id="add-student-btn"
           onClick={openAdd}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary hidden sm:flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Tambah Murid
@@ -267,16 +268,68 @@ export default function Students() {
         />
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
+      {/* Mobile Card List (hidden on md+) */}
+      {!loading && students.length > 0 && (
+        <div className="block md:hidden space-y-3">
+          {students.map((s, i) => (
+            <div
+              key={s.id}
+              id={`student-card-mobile-${s.id}`}
+              className="card p-4"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(99,102,241,0.4), rgba(79,70,229,0.4))',
+                    border: '1px solid rgba(99,102,241,0.3)',
+                    color: '#a5b4fc',
+                  }}
+                >
+                  {s.nama.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold truncate" style={{ color: '#e2e8f0' }}>{s.nama}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
+                    Kelas {s.kelas} {s.nisn ? `· NISN: ${s.nisn}` : ''}
+                  </p>
+                </div>
+                <div className="flex gap-2 flex-shrink-0">
+                  <button
+                    id={`edit-student-${s.id}`}
+                    onClick={() => openEdit(s)}
+                    className="p-2 rounded-lg transition-colors"
+                    style={{ background: 'rgba(30,41,59,0.8)', color: '#94a3b8' }}
+                    title="Edit"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    id={`delete-student-${s.id}`}
+                    onClick={() => setDeleteTarget(s)}
+                    className="p-2 rounded-lg transition-colors"
+                    style={{ background: 'rgba(190,18,60,0.2)', color: '#f87171' }}
+                    title="Hapus"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop Table (hidden on mobile) */}
+      <div className="hidden md:block card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-7 h-7 text-islamic-500 animate-spin" />
+            <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#475569' }} />
           </div>
         ) : students.length === 0 ? (
           <div className="py-16 text-center">
-            <Users className="w-10 h-10 text-islamic-700 mx-auto mb-3" />
-            <p className="text-islamic-500">
+            <Users className="w-10 h-10 mx-auto mb-3" style={{ color: '#334155' }} />
+            <p style={{ color: '#64748b' }}>
               {debouncedSearch ? 'Tidak ada murid yang cocok' : 'Belum ada murid terdaftar'}
             </p>
             {!debouncedSearch && (
@@ -289,36 +342,41 @@ export default function Students() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-islamic-800/60">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-islamic-500 uppercase tracking-wider">No</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-islamic-500 uppercase tracking-wider">Nama</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-islamic-500 uppercase tracking-wider">Kelas</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-islamic-500 uppercase tracking-wider">NISN</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-islamic-500 uppercase tracking-wider">Aksi</th>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>No</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>Nama</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>Kelas</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>NISN</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-islamic-800/40">
+              <tbody>
                 {students.map((s, i) => (
-                  <tr key={s.id} id={`student-row-${s.id}`} className="hover:bg-islamic-800/30 transition-colors">
-                    <td className="px-5 py-3.5 text-islamic-500">{(page - 1) * PAGE_SIZE + i + 1}</td>
+                  <tr key={s.id} id={`student-row-${s.id}`}
+                      className="transition-colors"
+                      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(30,41,59,0.5)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = ''}
+                  >
+                    <td className="px-5 py-3.5" style={{ color: '#475569' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-islamic-600 to-islamic-800
-                                        flex items-center justify-center text-xs font-bold text-gold-300 flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
+                             style={{ background: 'linear-gradient(135deg,rgba(99,102,241,0.35),rgba(79,70,229,0.35))', color: '#a5b4fc' }}>
                           {s.nama.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-medium text-islamic-100">{s.nama}</span>
+                        <span className="font-medium" style={{ color: '#e2e8f0' }}>{s.nama}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-islamic-300">{s.kelas}</td>
-                    <td className="px-5 py-3.5 text-islamic-400 font-mono text-xs">{s.nisn || '-'}</td>
+                    <td className="px-5 py-3.5" style={{ color: '#cbd5e1' }}>{s.kelas}</td>
+                    <td className="px-5 py-3.5 font-mono text-xs" style={{ color: '#64748b' }}>{s.nisn || '-'}</td>
                     <td className="px-5 py-3.5 text-right">
                       <div className="inline-flex gap-2">
                         <button
                           id={`edit-student-${s.id}`}
                           onClick={() => openEdit(s)}
-                          className="p-2 rounded-lg bg-islamic-800/60 text-islamic-400 hover:text-islamic-100
-                                     hover:bg-islamic-700/60 transition-colors"
+                          className="p-2 rounded-lg transition-colors"
+                          style={{ background: 'rgba(30,41,59,0.8)', color: '#94a3b8' }}
                           title="Edit"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -326,8 +384,8 @@ export default function Students() {
                         <button
                           id={`delete-student-${s.id}`}
                           onClick={() => setDeleteTarget(s)}
-                          className="p-2 rounded-lg bg-red-900/30 text-red-500 hover:text-red-300
-                                     hover:bg-red-800/40 transition-colors"
+                          className="p-2 rounded-lg transition-colors"
+                          style={{ background: 'rgba(190,18,60,0.2)', color: '#f87171' }}
                           title="Hapus"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -341,6 +399,23 @@ export default function Students() {
           </div>
         )}
       </div>
+
+      {/* Mobile: empty state when no students */}
+      {!loading && students.length === 0 && (
+        <div className="block md:hidden card p-10 text-center">
+          <Users className="w-10 h-10 mx-auto mb-3" style={{ color: '#334155' }} />
+          <p style={{ color: '#64748b' }}>
+            {debouncedSearch ? 'Tidak ada murid yang cocok' : 'Belum ada murid terdaftar'}
+          </p>
+        </div>
+      )}
+
+      {/* Mobile loading */}
+      {loading && (
+        <div className="block md:hidden flex items-center justify-center py-16">
+          <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#475569' }} />
+        </div>
+      )}
 
       {/* Pagination */}
       {!loading && totalCount > 0 && (
@@ -411,6 +486,16 @@ export default function Students() {
           loading={formLoading}
         />
       )}
+
+      {/* Mobile FAB: Tambah Murid */}
+      <button
+        id="add-student-fab"
+        onClick={openAdd}
+        className="fab"
+        aria-label="Tambah Murid"
+      >
+        <Plus className="w-6 h-6 text-white" />
+      </button>
     </div>
   )
 }

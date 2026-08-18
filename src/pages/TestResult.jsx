@@ -141,19 +141,19 @@ export default function TestResult() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Top action bar */}
-      <div className="flex items-center justify-between animate-in">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between animate-in gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <Link
             to={`/students/${result.murid_id}/history`}
-            className="flex items-center gap-1.5 text-sm hover:text-amber-300 transition-colors"
+            className="flex items-center gap-1.5 text-sm hover:text-amber-300 transition-colors flex-shrink-0"
             style={{ color: '#94a3b8' }}
             id="back-to-history-btn"
           >
             <ArrowLeft className="w-4 h-4" />
-            Riwayat Tes
+            <span className="hidden sm:inline">Riwayat Tes</span>
           </Link>
-          <span style={{ color: '#334155' }}>·</span>
-          <span className="text-sm font-semibold truncate max-w-xs" style={{ color: '#cbd5e1' }}>
+          <span className="hidden sm:inline" style={{ color: '#334155' }}>·</span>
+          <span className="text-sm font-semibold truncate" style={{ color: '#cbd5e1' }}>
             {result.murid?.nama}
           </span>
         </div>
@@ -163,7 +163,7 @@ export default function TestResult() {
           type="button"
           onClick={handleDeleteTest}
           disabled={deleting}
-          className="text-xs px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 transition-colors flex-shrink-0"
           style={{
             background: 'rgba(239,68,68,0.12)',
             border: '1px solid rgba(239,68,68,0.3)',
@@ -174,7 +174,7 @@ export default function TestResult() {
           {deleting ? (
             <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Menghapus…</>
           ) : (
-            <><Trash2 className="w-3.5 h-3.5" /> Hapus Tes</>
+            <><Trash2 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Hapus Tes</span></>
           )}
         </button>
       </div>
@@ -220,7 +220,7 @@ export default function TestResult() {
 
         {/* Score big number */}
         <div className="text-center">
-          <p className="text-7xl font-black text-white leading-none">{result.skor_total}</p>
+          <p className="text-5xl sm:text-7xl font-black text-white leading-none">{result.skor_total}</p>
           <p className="text-white/60 text-xs mt-1.5">Skor Total Tertimbang</p>
         </div>
 
@@ -278,8 +278,8 @@ export default function TestResult() {
       </div>
 
       {/* PDF Download */}
-      <div className="card p-6 space-y-4 animate-in">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="card p-4 md:p-6 space-y-4 animate-in">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <p className="font-semibold text-base" style={{ color: '#f8fafc' }}>Sertifikat PDF</p>
             <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
@@ -290,7 +290,7 @@ export default function TestResult() {
             id="download-pdf-btn"
             onClick={handleDownloadPDF}
             disabled={pdfLoading}
-            className="btn-gold flex items-center justify-center gap-2 text-sm py-3 px-5 flex-shrink-0"
+            className="btn-gold flex items-center justify-center gap-2 text-sm py-3 px-5 w-full sm:w-auto flex-shrink-0"
           >
             {pdfLoading
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyiapkan PDF…</>
