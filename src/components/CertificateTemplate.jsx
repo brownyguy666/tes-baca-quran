@@ -157,11 +157,11 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         style={{
           position: 'absolute',
           left: '50%',
-          top: '50%',
-          marginLeft: '-150px',
-          marginTop: '-150px',
-          width: '300px',
-          height: '300px',
+          top: '48%',
+          marginLeft: '-140px',
+          marginTop: '-140px',
+          width: '280px',
+          height: '280px',
           opacity: 0.035,
           pointerEvents: 'none',
         }}
@@ -173,13 +173,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         />
       </div>
 
-      {/* ── Inner Content Container (Full Precision Flexbox) ── */}
+      {/* ── Inner Content Container (Shifted Upwards with Generous Bottom Clearance) ── */}
       <div
         style={{
           position: 'relative',
           width: '100%',
           height: '100%',
-          padding: '24px 44px',
+          padding: '20px 44px 34px 44px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -190,12 +190,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             HEADER SECTION: Kop Surat & Pill Badges
             ══════════════════════════════════════════════════════════ */}
         <div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '4px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2px' }}>
             <tbody>
               <tr>
                 {/* Top Left: Nomor Sertifikat Box */}
                 <td style={{ width: '230px', verticalAlign: 'top', padding: 0 }}>
-                  <p style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
+                  <p style={{ fontSize: '9px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
                     Nomor Sertifikat:
                   </p>
                   <div
@@ -203,7 +203,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                       border: '1.5px solid #c9a227',
                       borderRadius: '8px',
                       backgroundColor: '#fffdf5',
-                      padding: '4px 8px',
+                      padding: '3px 8px',
                       textAlign: 'center',
                       fontSize: '11px',
                       fontWeight: 800,
@@ -222,14 +222,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                     <img
                       src="/logo-smpn2glagah.png"
                       alt="Logo SMPN 2 Glagah"
-                      style={{ width: '56px', height: '56px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+                      style={{ width: '54px', height: '54px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
                     />
                     <div style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', color: '#475569', margin: 0, textTransform: 'uppercase' }}>
+                      <p style={{ fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.14em', color: '#475569', margin: 0, textTransform: 'uppercase' }}>
                         Pemerintah Kabupaten Banyuwangi · Dinas Pendidikan
                       </p>
                       <h1 style={{
-                        fontSize: '21px',
+                        fontSize: '20px',
                         fontWeight: 900,
                         color: '#14532d',
                         margin: '1px 0',
@@ -247,7 +247,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
 
                 {/* Top Right: Tanggal Terbit Box */}
                 <td style={{ width: '230px', verticalAlign: 'top', padding: 0, textAlign: 'right' }}>
-                  <p style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
+                  <p style={{ fontSize: '9px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
                     Tanggal Terbit:
                   </p>
                   <div
@@ -255,7 +255,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                       border: '1.5px solid #c9a227',
                       borderRadius: '8px',
                       backgroundColor: '#fffdf5',
-                      padding: '4px 8px',
+                      padding: '3px 8px',
                       textAlign: 'center',
                       fontSize: '11px',
                       fontWeight: 800,
@@ -265,7 +265,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                   >
                     {formattedDate}
                   </div>
-                  <p style={{ fontSize: '9px', color: '#64748b', margin: '3px 0 0 0', fontWeight: 600 }}>
+                  <p style={{ fontSize: '9px', color: '#64748b', margin: '2px 0 0 0', fontWeight: 600 }}>
                     Banyuwangi, {formattedDate}
                   </p>
                 </td>
@@ -274,7 +274,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           </table>
 
           {/* Gold Header Divider Line */}
-          <div style={{ width: '100%', height: '1.5px', background: 'linear-gradient(to right, transparent, #c9a227 20%, #c9a227 80%, transparent)', margin: '2px 0 1px 0' }} />
+          <div style={{ width: '100%', height: '1.5px', background: 'linear-gradient(to right, transparent, #c9a227 20%, #c9a227 80%, transparent)', margin: '2px 0 0 0' }} />
         </div>
 
         {/* ══════════════════════════════════════════════════════════
@@ -282,7 +282,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             ══════════════════════════════════════════════════════════ */}
         <div style={{ textAlign: 'center', margin: '0' }}>
           <h2 style={{
-            fontSize: '24px',
+            fontSize: '23px',
             fontWeight: 900,
             color: isPassed ? '#14532d' : '#991b1b',
             fontFamily: "'Playfair Display', Georgia, serif",
@@ -299,12 +299,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             backgroundColor: isPassed ? '#14532d' : '#991b1b',
             border: '1.5px solid #c9a227',
             borderRadius: '20px',
-            padding: '3px 32px',
-            margin: '2px 0 2px 0',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            padding: '2.5px 30px',
+            margin: '2px 0 1px 0',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.12)',
           }}>
             <span style={{
-              fontSize: '11px',
+              fontSize: '10.5px',
               fontWeight: 900,
               color: '#fef08a',
               letterSpacing: '0.15em',
@@ -314,7 +314,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             </span>
           </div>
 
-          <p style={{ fontSize: '10px', color: '#475569', margin: '1px 0 0 0', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '9.5px', color: '#475569', margin: '1px 0 0 0', fontStyle: 'italic' }}>
             Diberikan kepada:
           </p>
         </div>
@@ -327,7 +327,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             backgroundColor: '#ffffff',
             border: '1.5px solid #c9a227',
             borderRadius: '10px',
-            padding: '8px 16px',
+            padding: '7px 16px',
             boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
             position: 'relative',
           }}
@@ -336,14 +336,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           <div
             style={{
               position: 'absolute',
-              top: '-10px',
+              top: '-9px',
               left: '50%',
               transform: 'translateX(-50%)',
               backgroundColor: '#14532d',
               border: '1px solid #c9a227',
               borderRadius: '12px',
               padding: '1px 16px',
-              fontSize: '9px',
+              fontSize: '8.5px',
               fontWeight: 800,
               color: '#fef3c7',
               textTransform: 'uppercase',
@@ -357,13 +357,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             <tbody>
               {/* Row 1: Nama Lengkap Siswa */}
               <tr>
-                <td style={{ width: '150px', fontSize: '11px', fontWeight: 700, color: '#334155', padding: '3px 0' }}>
+                <td style={{ width: '145px', fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '2px 0' }}>
                   Nama Lengkap Siswa
                 </td>
-                <td style={{ width: '15px', fontSize: '11px', fontWeight: 700, color: '#334155', padding: '3px 0' }}>:</td>
-                <td colSpan={4} style={{ padding: '3px 0', borderBottom: '1px solid #cbd5e1' }}>
+                <td style={{ width: '15px', fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '2px 0' }}>:</td>
+                <td colSpan={4} style={{ padding: '2px 0', borderBottom: '1px solid #cbd5e1' }}>
                   <span style={{
-                    fontSize: '16px',
+                    fontSize: '15.5px',
                     fontWeight: 900,
                     color: '#14532d',
                     fontFamily: "'Playfair Display', Georgia, serif",
@@ -377,20 +377,20 @@ export default function CertificateTemplate({ result, id = 'certificate-template
 
               {/* Row 2: Kelas & NISN */}
               <tr>
-                <td style={{ fontSize: '11px', fontWeight: 700, color: '#334155', padding: '4px 0 2px 0' }}>
+                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>
                   Kelas
                 </td>
-                <td style={{ fontSize: '11px', fontWeight: 700, color: '#334155', padding: '4px 0 2px 0' }}>:</td>
-                <td style={{ width: '220px', padding: '4px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
+                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>:</td>
+                <td style={{ width: '220px', padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#0f172a' }}>
                     {result.murid?.kelas || result.kelas_murid || '-'}
                   </span>
                 </td>
-                <td style={{ width: '80px', fontSize: '11px', fontWeight: 700, color: '#334155', textAlign: 'right', padding: '4px 10px 2px 0' }}>
+                <td style={{ width: '80px', fontSize: '10.5px', fontWeight: 700, color: '#334155', textAlign: 'right', padding: '3px 10px 2px 0' }}>
                   NISN :
                 </td>
-                <td colSpan={2} style={{ padding: '4px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace' }}>
+                <td colSpan={2} style={{ padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace' }}>
                     {result.murid?.nisn || result.nisn_murid || '-'}
                   </span>
                 </td>
@@ -398,12 +398,12 @@ export default function CertificateTemplate({ result, id = 'certificate-template
 
               {/* Row 3: Surat & Ayat yang Diuji */}
               <tr>
-                <td style={{ fontSize: '11px', fontWeight: 700, color: '#334155', padding: '4px 0 2px 0' }}>
+                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>
                   Surat &amp; Ayat yang Diuji
                 </td>
-                <td style={{ fontSize: '11px', fontWeight: 700, color: '#334155', padding: '4px 0 2px 0' }}>:</td>
-                <td colSpan={4} style={{ padding: '4px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#14532d', fontStyle: 'italic' }}>
+                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>:</td>
+                <td colSpan={4} style={{ padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#14532d', fontStyle: 'italic' }}>
                     📖 {cleanAyat ? `QS. ${cleanAyat}` : 'Al-Qur\'an'}
                   </span>
                 </td>
@@ -429,45 +429,45 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             }}
           >
             {/* Table Header */}
-            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '4px 8px', textAlign: 'center', fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '3px 8px', textAlign: 'center', fontSize: '9px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               RINCIAN SKOR &amp; CAPAIAN
             </div>
 
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #cbd5e1' }}>
-                  <th style={{ fontSize: '9.5px', fontWeight: 800, color: '#475569', padding: '4px 8px', textAlign: 'left' }}>ASPEK PENILAIAN</th>
-                  <th style={{ fontSize: '9.5px', fontWeight: 800, color: '#475569', padding: '4px 8px', textAlign: 'center', width: '60px' }}>BOBOT</th>
-                  <th style={{ fontSize: '9.5px', fontWeight: 800, color: '#475569', padding: '4px 8px', textAlign: 'center', width: '90px' }}>SKOR (0–100)</th>
+                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'left' }}>ASPEK PENILAIAN</th>
+                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'center', width: '60px' }}>BOBOT</th>
+                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'center', width: '90px' }}>SKOR (0–100)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#334155', padding: '4px 8px' }}>Makharijul Huruf</td>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748b', padding: '4px 8px', textAlign: 'center' }}>35%</td>
-                  <td style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', padding: '4px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Makharijul Huruf</td>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>35%</td>
+                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
                     {result.skor_makhraj ?? '-'}
                   </td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#334155', padding: '4px 8px' }}>Kaidah Tajwid</td>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748b', padding: '4px 8px', textAlign: 'center' }}>40%</td>
-                  <td style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', padding: '4px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Kaidah Tajwid</td>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>40%</td>
+                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
                     {result.skor_tajwid ?? '-'}
                   </td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#334155', padding: '4px 8px' }}>Kelancaran &amp; Adab</td>
-                  <td style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748b', padding: '4px 8px', textAlign: 'center' }}>25%</td>
-                  <td style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', padding: '4px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Kelancaran &amp; Adab</td>
+                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>25%</td>
+                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
                     {result.skor_kelancaran ?? '-'}
                   </td>
                 </tr>
                 {/* Total Row */}
                 <tr style={{ backgroundColor: isPassed ? '#f0fdf4' : '#fef2f2' }}>
-                  <td style={{ fontSize: '11px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '5px 8px' }}>TOTAL SKOR AKHIR</td>
-                  <td style={{ fontSize: '10.5px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '5px 8px', textAlign: 'center' }}>100%</td>
-                  <td style={{ fontSize: '14px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
+                  <td style={{ fontSize: '10.5px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px' }}>TOTAL SKOR AKHIR</td>
+                  <td style={{ fontSize: '10px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px', textAlign: 'center' }}>100%</td>
+                  <td style={{ fontSize: '13.5px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
                     {totalScore}
                   </td>
                 </tr>
@@ -490,19 +490,19 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             }}
           >
             {/* Table Header */}
-            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '4px 8px', textAlign: 'center', fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '3px 8px', textAlign: 'center', fontSize: '9px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               PREDIKAT / LEVEL CAPAIAN
             </div>
 
-            <div style={{ padding: '4px 10px', display: 'flex', flexDirection: 'column', gap: '3px', flex: 1, justifyContent: 'space-around' }}>
+            <div style={{ padding: '3px 10px', display: 'flex', flexDirection: 'column', gap: '2.5px', flex: 1, justifyContent: 'space-around' }}>
               {/* Row 1: Mumtaz */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{
-                    width: '14px', height: '14px', borderRadius: '3px',
+                    width: '13px', height: '13px', borderRadius: '3px',
                     border: activeLevel === 'mumtaz' ? '1.5px solid #d97706' : '1.5px solid #94a3b8',
                     backgroundColor: activeLevel === 'mumtaz' ? '#d97706' : '#ffffff',
-                    color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {activeLevel === 'mumtaz' ? '✓' : ''}
                   </div>
@@ -514,13 +514,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               </div>
 
               {/* Row 2: Mahir */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{
-                    width: '14px', height: '14px', borderRadius: '3px',
+                    width: '13px', height: '13px', borderRadius: '3px',
                     border: activeLevel === 'mahir' ? '1.5px solid #16a34a' : '1.5px solid #94a3b8',
                     backgroundColor: activeLevel === 'mahir' ? '#16a34a' : '#ffffff',
-                    color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {activeLevel === 'mahir' ? '✓' : ''}
                   </div>
@@ -532,13 +532,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               </div>
 
               {/* Row 3: Menengah */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{
-                    width: '14px', height: '14px', borderRadius: '3px',
+                    width: '13px', height: '13px', borderRadius: '3px',
                     border: activeLevel === 'menengah' ? '1.5px solid #ea580c' : '1.5px solid #94a3b8',
                     backgroundColor: activeLevel === 'menengah' ? '#ea580c' : '#ffffff',
-                    color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {activeLevel === 'menengah' ? '✓' : ''}
                   </div>
@@ -550,13 +550,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               </div>
 
               {/* Row 4: Dasar */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{
-                    width: '14px', height: '14px', borderRadius: '3px',
+                    width: '13px', height: '13px', borderRadius: '3px',
                     border: activeLevel === 'dasar' ? '1.5px solid #2563eb' : '1.5px solid #94a3b8',
                     backgroundColor: activeLevel === 'dasar' ? '#2563eb' : '#ffffff',
-                    color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {activeLevel === 'dasar' ? '✓' : ''}
                   </div>
@@ -568,13 +568,13 @@ export default function CertificateTemplate({ result, id = 'certificate-template
               </div>
 
               {/* Row 5: Remidi */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{
-                    width: '14px', height: '14px', borderRadius: '3px',
+                    width: '13px', height: '13px', borderRadius: '3px',
                     border: activeLevel === 'remidi' ? '1.5px solid #dc2626' : '1.5px solid #94a3b8',
                     backgroundColor: activeLevel === 'remidi' ? '#dc2626' : '#ffffff',
-                    color: '#ffffff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {activeLevel === 'remidi' ? '✓' : ''}
                   </div>
@@ -596,7 +596,7 @@ export default function CertificateTemplate({ result, id = 'certificate-template
             backgroundColor: '#ffffff',
             border: '1.5px solid #c9a227',
             borderRadius: '8px',
-            padding: '6px 14px',
+            padding: '5px 14px',
             boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
             position: 'relative',
           }}
@@ -604,14 +604,14 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           <div
             style={{
               position: 'absolute',
-              top: '-9px',
+              top: '-8px',
               left: '50%',
               transform: 'translateX(-50%)',
               backgroundColor: '#14532d',
               border: '1px solid #c9a227',
               borderRadius: '10px',
               padding: '1px 14px',
-              fontSize: '8.5px',
+              fontSize: '8px',
               fontWeight: 800,
               color: '#fef3c7',
               textTransform: 'uppercase',
@@ -622,11 +622,11 @@ export default function CertificateTemplate({ result, id = 'certificate-template
           </div>
 
           <p style={{
-            fontSize: '10.5px',
+            fontSize: '10px',
             fontStyle: 'italic',
             fontWeight: 600,
             color: isPassed ? '#1e293b' : '#991b1b',
-            lineHeight: 1.35,
+            lineHeight: 1.3,
             margin: '2px 0 0 0',
           }}>
             {notesText}
@@ -634,21 +634,21 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         </div>
 
         {/* ══════════════════════════════════════════════════════════
-            SIGNATURES SECTION (NO STAMP)
+            SIGNATURES SECTION (LIFTED HIGHER & SPACED FROM BOTTOM)
             ══════════════════════════════════════════════════════════ */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', padding: '0 10px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', padding: '0 10px', margin: '0 0 6px 0' }}>
           <tbody>
             <tr>
               {/* Left: Kepala Sekolah */}
               <td style={{ width: '35%', textAlign: 'center', verticalAlign: 'bottom' }}>
-                <p style={{ fontSize: '10px', color: '#475569', margin: 0 }}>Mengetahui,</p>
-                <p style={{ fontSize: '11px', fontWeight: 800, color: '#14532d', margin: '1px 0 36px 0' }}>
+                <p style={{ fontSize: '9.5px', color: '#475569', margin: 0 }}>Mengetahui,</p>
+                <p style={{ fontSize: '10.5px', fontWeight: 800, color: '#14532d', margin: '1px 0 32px 0' }}>
                   Kepala SMP Negeri 2 Glagah
                 </p>
-                <p style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
+                <p style={{ fontSize: '11.5px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
                   SRIATUN, S.Pd.
                 </p>
-                <p style={{ fontSize: '9.5px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
+                <p style={{ fontSize: '9px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
                   NIP. 197006061999032006
                 </p>
               </td>
@@ -658,8 +658,8 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                 <div
                   style={{
                     display: 'inline-block',
-                    width: '56px',
-                    height: '56px',
+                    width: '52px',
+                    height: '52px',
                     borderRadius: '50%',
                     backgroundColor: '#d4af37',
                     border: '2px solid #78350f',
@@ -673,23 +673,23 @@ export default function CertificateTemplate({ result, id = 'certificate-template
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 </div>
-                <p style={{ fontSize: '7.5px', fontWeight: 800, color: '#78350f', letterSpacing: '0.08em', margin: '2px 0 0 0', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: '7px', fontWeight: 800, color: '#78350f', letterSpacing: '0.08em', margin: '2px 0 0 0', textTransform: 'uppercase' }}>
                   SMPN 2 GLAGAH
                 </p>
               </td>
 
               {/* Right: Guru Penguji / PAI */}
               <td style={{ width: '35%', textAlign: 'center', verticalAlign: 'bottom' }}>
-                <p style={{ fontSize: '10px', color: '#475569', margin: 0 }}>
+                <p style={{ fontSize: '9.5px', color: '#475569', margin: 0 }}>
                   Banyuwangi, {formattedDate}
                 </p>
-                <p style={{ fontSize: '11px', fontWeight: 800, color: '#14532d', margin: '1px 0 36px 0' }}>
+                <p style={{ fontSize: '10.5px', fontWeight: 800, color: '#14532d', margin: '1px 0 32px 0' }}>
                   Guru Penguji / PAI
                 </p>
-                <p style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
+                <p style={{ fontSize: '11.5px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
                   {result.guru_penguji || 'Guru PAI'}
                 </p>
-                <p style={{ fontSize: '9.5px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
+                <p style={{ fontSize: '9px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
                   Guru Pendidikan Agama Islam
                 </p>
               </td>
