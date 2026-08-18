@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, ClipboardList, LogOut,
   Menu, X, BookOpen, ChevronRight, FileText,
   BarChart3, SlidersHorizontal, GraduationCap, Tv,
-  History,
+  History, Sparkles,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
@@ -36,6 +36,18 @@ const NAV_GROUPS = [
   },
 ]
 
+// ── Demo Navigation Groups ─────────────────────────────────────
+const DEMO_NAV_GROUPS = [
+  {
+    label: 'MODE DEMO KEMENAG',
+    items: [
+      { to: '/demo',   icon: Sparkles, label: 'Studio AI Penilai', badge: 'Demo' },
+      { to: '/live',   icon: Tv,       label: 'Layar Siswa (Live)', badge: 'Live' },
+      { to: '/rubric', icon: BookOpen, label: 'Panduan & Rubrik' },
+    ],
+  },
+]
+
 // ── Bottom Nav Items (mobile) — 5 paling penting ──────────────
 const BOTTOM_NAV_ITEMS = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Beranda' },
@@ -45,9 +57,16 @@ const BOTTOM_NAV_ITEMS = [
   { to: '/settings',  icon: SlidersHorizontal, label: 'Setelan' },
 ]
 
+const DEMO_BOTTOM_NAV_ITEMS = [
+  { to: '/demo',   icon: Sparkles, label: 'Uji AI' },
+  { to: '/live',   icon: Tv,       label: 'Layar' },
+  { to: '/rubric', icon: BookOpen, label: 'Rubrik' },
+]
+
 // ── Topbar ────────────────────────────────────────────────────
 function Topbar({ onMenuClick }) {
-  const { profile } = useAuth()
+  const { profile, isDemo, signOut } = useAuth()
+  const navigate = useNavigate()
   const hour = new Date().getHours()
   const greeting =
     hour < 11 ? 'Selamat Pagi' : hour < 15 ? 'Selamat Siang' : 'Selamat Sore'
@@ -107,26 +126,47 @@ function Topbar({ onMenuClick }) {
         </span>
       </div>
 
-      {/* User greeting + avatar */}
+      {/* User greeting + avatar + demo badge */}
       <div className="flex items-center gap-3">
-        <div className="text-right hidden sm:block">
-          <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>
-            {greeting}, {profile?.name} 👋
-          </p>
-          <p className="text-[11px]" style={{ color: '#475569' }}>
-            Penguji / Guru PAI
-          </p>
-        </div>
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, rgba(212,175,55,0.35), rgba(212,175,55,0.15))',
-            border: '2px solid rgba(212,175,55,0.5)',
-            color: '#d4af37',
-          }}
-        >
-          {initial}
-        </div>
+        {isDemo ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Mode Demo Kemenag</span>
+            </div>
+            <button
+              onClick={async () => {
+                await signOut()
+                toast.success('Keluar dari mode demo')
+                navigate('/login')
+              }}
+              className="text-xs px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 hover:bg-rose-500/25 transition-colors font-semibold"
+            >
+              Keluar
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>
+                {greeting}, {profile?.name} 👋
+              </p>
+              <p className="text-[11px]" style={{ color: '#475569' }}>
+                Penguji / Guru PAI
+              </p>
+            </div>
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.35), rgba(212,175,55,0.15))',
+                border: '2px solid rgba(212,175,55,0.5)',
+                color: '#d4af37',
+              }}
+            >
+              {initial}
+            </div>
+          </>
+        )}
       </div>
     </header>
   )
@@ -134,9 +174,10 @@ function Topbar({ onMenuClick }) {
 
 // ── Sidebar Content (desktop + mobile drawer) ─────────────────
 function SidebarContent({ onClose }) {
-  const { profile, signOut } = useAuth()
+  const { profile, signOut, isDemo } = useAuth()
   const navigate = useNavigate()
   const initial = (profile?.name || profile?.email || 'G').charAt(0).toUpperCase()
+  const navGroups = isDemo ? DEMO_NAV_GROUPS : NAV_GROUPS
 
   const handleSignOut = async () => {
     await signOut()
@@ -198,12 +239,12 @@ function SidebarContent({ onClose }) {
             <span
               className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
               style={{
-                background: 'rgba(212,175,55,0.15)',
-                border: '1px solid rgba(212,175,55,0.3)',
-                color: '#d4af37',
+                background: isDemo ? 'rgba(99,102,241,0.2)' : 'rgba(212,175,55,0.15)',
+                border: `1px solid ${isDemo ? 'rgba(99,102,241,0.4)' : 'rgba(212,175,55,0.3)'}`,
+                color: isDemo ? '#c7d2fe' : '#d4af37',
               }}
             >
-              Penguji
+              {isDemo ? 'Pengawas / Tamu' : 'Penguji'}
             </span>
           </div>
         </div>
@@ -211,7 +252,7 @@ function SidebarContent({ onClose }) {
 
       {/* ── Navigation Groups ── */}
       <nav className="flex-1 px-3 pb-2">
-        {NAV_GROUPS.map((group) => (
+        {navGroups.map((group) => (
           <div key={group.label}>
             <p className="nav-group-label">{group.label}</p>
             <div className="space-y-0.5">
@@ -268,7 +309,7 @@ function SidebarContent({ onClose }) {
           id="sign-out-btn"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" style={{ color: '#f43f5e' }} />
-          <span>Keluar</span>
+          <span>{isDemo ? 'Keluar Mode Demo' : 'Keluar'}</span>
         </button>
         <p
           className="text-[10px] text-center mt-3 font-arabic leading-relaxed"
@@ -283,7 +324,9 @@ function SidebarContent({ onClose }) {
 
 // ── Bottom Navigation Bar (Mobile Only) ───────────────────────
 function BottomNav() {
+  const { isDemo } = useAuth()
   const location = useLocation()
+  const items = isDemo ? DEMO_BOTTOM_NAV_ITEMS : BOTTOM_NAV_ITEMS
 
   const isActive = (to) => {
     if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/'
@@ -292,7 +335,7 @@ function BottomNav() {
 
   return (
     <nav className="bottom-nav" aria-label="Navigasi utama mobile">
-      {BOTTOM_NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+      {items.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
           to={to}

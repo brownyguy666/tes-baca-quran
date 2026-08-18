@@ -13,11 +13,14 @@ import Reports from './pages/Reports'
 import Rubric from './pages/Rubric'
 import Settings from './pages/Settings'
 import LiveScreen from './pages/LiveScreen'
+import DemoAssessment from './pages/DemoAssessment'
 
 function PublicRoute({ children }) {
-  const { session, isLoading } = useAuth()
+  const { session, isDemo, isLoading } = useAuth()
   if (isLoading) return null
-  if (session) return <Navigate to="/dashboard" replace />
+  if (session) {
+    return <Navigate to={isDemo ? '/demo' : '/dashboard'} replace />
+  }
   return children
 }
 
@@ -29,17 +32,33 @@ function Protected({ children }) {
   )
 }
 
+function RoleHomeRedirect() {
+  const { isDemo } = useAuth()
+  return <Navigate to={isDemo ? '/demo' : '/dashboard'} replace />
+}
+
 export default function App() {
+  const { isDemo } = useAuth()
+
   return (
     <Routes>
       {/* Public */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
+      {/* Demo Assessment studio for Kemenag / Guest evaluators */}
+      <Route path="/demo" element={<Protected><DemoAssessment /></Protected>} />
+
       {/* Protected — wrapped in Layout */}
-      <Route path="/dashboard"             element={<Protected><Dashboard /></Protected>} />
+      <Route
+        path="/dashboard"
+        element={<Protected>{isDemo ? <DemoAssessment /> : <Dashboard />}</Protected>}
+      />
+      <Route
+        path="/test/new"
+        element={<Protected>{isDemo ? <DemoAssessment /> : <NewTest />}</Protected>}
+      />
       <Route path="/students"              element={<Protected><Students /></Protected>} />
       <Route path="/students/:id/history"  element={<Protected><TestHistory /></Protected>} />
-      <Route path="/test/new"              element={<Protected><NewTest /></Protected>} />
       <Route path="/test/result/:id"       element={<Protected><TestResult /></Protected>} />
 
       {/* New routes */}
@@ -52,8 +71,9 @@ export default function App() {
       <Route path="/live"                  element={<LiveScreen />} />
 
       {/* Default */}
-      <Route path="/"  element={<Navigate to="/dashboard" replace />} />
-      <Route path="*"  element={<Navigate to="/dashboard" replace />} />
+      <Route path="/"  element={<RoleHomeRedirect />} />
+      <Route path="*"  element={<RoleHomeRedirect />} />
     </Routes>
   )
 }
+

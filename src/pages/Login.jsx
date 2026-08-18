@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, BookOpen, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, BookOpen, Loader2, Sparkles } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -10,7 +10,7 @@ export default function Login() {
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading]   = useState(false)
 
-  const { signIn } = useAuth()
+  const { signIn, loginAsDemo } = useAuth()
   const navigate   = useNavigate()
   const location   = useLocation()
   const from       = location.state?.from?.pathname || '/dashboard'
@@ -35,6 +35,12 @@ export default function Login() {
       toast.success('Selamat datang! 👋')
       navigate(from, { replace: true })
     }
+  }
+
+  const handleDemoLogin = () => {
+    loginAsDemo()
+    toast.success('Masuk ke Mode Demo Pengawas Kemenag ✨')
+    navigate('/demo', { replace: true })
   }
 
   return (
@@ -126,11 +132,40 @@ export default function Login() {
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-800" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase tracking-wider">
+              <span className="px-3 text-slate-500 bg-slate-900/90 font-bold rounded-full">
+                Atau
+              </span>
+            </div>
+          </div>
+
+          {/* Demo Mode Button for Kemenag / Guests */}
+          <button
+            type="button"
+            id="demo-login-btn"
+            onClick={handleDemoLogin}
+            className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01]"
+            style={{
+              background: 'linear-gradient(135deg, rgba(212,175,55,0.18), rgba(99,102,241,0.22))',
+              border: '1px solid rgba(212,175,55,0.4)',
+              color: '#fef3c7',
+              boxShadow: '0 4px 16px rgba(212,175,55,0.12)',
+            }}
+          >
+            <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+            <span>Masuk Mode Demo (Pengawas Kemenag / Tamu)</span>
+          </button>
+
           {/* Footer note */}
           <div className="mt-6 pt-5 border-t border-islamic-800/60">
             <p className="text-xs text-islamic-600 text-center leading-relaxed">
               Akun guru dibuat oleh administrator.<br />
-              Hubungi admin sekolah jika belum memiliki akun.
+              Mode Demo dapat digunakan langsung untuk menguji fitur AI Penilai Tilawah.
             </p>
           </div>
         </div>
