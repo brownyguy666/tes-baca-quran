@@ -14,88 +14,144 @@ function getRomanMonth(monthIndex) {
   return roman[monthIndex] || 'VIII'
 }
 
-function getActiveLevelKey(totalScore, levelLabel) {
-  const score = Number(totalScore) || 0
-  if (score < 50 || (levelLabel && levelLabel.toLowerCase().includes('remidi'))) {
-    return 'remidi'
+function getPredikatInfo(totalScore, levelLabel) {
+  const total = Number(totalScore) || 0
+  if (total < 50 || (levelLabel && levelLabel.toLowerCase().includes('remidi'))) {
+    return {
+      label: 'Remidi (Wajib Mengulang)',
+      tier: 'remidi',
+      accentA: '#c47784',
+      accentB: '#7c2432',
+      isPassed: false,
+    }
   }
-  if (score >= 91 || (levelLabel && levelLabel.toLowerCase().includes('mumtaz'))) {
-    return 'mumtaz'
+  if (total >= 91 || (levelLabel && levelLabel.toLowerCase().includes('mumtaz'))) {
+    return {
+      label: '✦ Mumtaz (Tartil)',
+      tier: 'mumtaz',
+      accentA: '#f0d68a',
+      accentB: '#a8791e',
+      isPassed: true,
+    }
   }
-  if (score >= 76 || (levelLabel && levelLabel.toLowerCase().includes('mahir'))) {
-    return 'mahir'
+  if (total >= 76 || (levelLabel && levelLabel.toLowerCase().includes('mahir'))) {
+    return {
+      label: 'Mahir',
+      tier: 'mahir',
+      accentA: '#5cbb8e',
+      accentB: '#0b4a38',
+      isPassed: true,
+    }
   }
-  if (score >= 61 || (levelLabel && levelLabel.toLowerCase().includes('menengah'))) {
-    return 'menengah'
+  if (total >= 61 || (levelLabel && levelLabel.toLowerCase().includes('menengah'))) {
+    return {
+      label: 'Menengah',
+      tier: 'menengah',
+      accentA: '#dcb15c',
+      accentB: '#9c6f1e',
+      isPassed: true,
+    }
   }
-  return 'dasar'
+  return {
+    label: 'Dasar (Cukup)',
+    tier: 'dasar',
+    accentA: '#c9a878',
+    accentB: '#7a5230',
+    isPassed: true,
+  }
 }
 
 function parseNotes(catatanStr, isPassed) {
   if (!catatanStr || !catatanStr.trim()) {
     if (!isPassed) {
-      return 'Nilai belum mencapai batas ketuntasan minimum (skor < 50). Wajib mengikuti bimbingan remidial bersama Guru PAI.'
+      return 'Nilai belum mencapai batas ketuntasan minimum (skor < 50). Wajib mengikuti bimbingan remidial bersama Guru PAI agar bacaan sesuai kaidah tartil.'
     }
-    return 'Makhraj huruf dan kaidah tajwid telah diuji sesuai standar rubrik tilawah. Pertahankan kelancaran dan kecintaan membaca Al-Qur\'an secara istiqomah.'
+    return 'Bacaan tergolong lancar dan memenuhi kaidah makharijul huruf serta tajwid standar. Tingkatkan kecintaan dan keistiqomahan membaca Al-Qur\'an setiap hari.'
   }
   return catatanStr.replace(/[;\n|]+/g, ' · ').trim()
 }
 
-// ── 4 Dedicated Corner Flourish SVGs (Ultra Sharp Vector Render) ──────────────
+// ── Corner SVGs ──────────────────────────────────────────────────────────────
 
-const CornerTopLeft = () => (
-  <svg width="76" height="76" viewBox="0 0 76 76" fill="none" style={{ position: 'absolute', top: '14px', left: '14px' }}>
-    <path d="M0 0 L76 0 L76 6 L6 6 L6 76 L0 76 Z" fill="#c9a227" />
-    <path d="M10 10 L66 10 L66 13 L13 13 L13 66 L10 66 Z" fill="#14532d" />
-    <circle cx="26" cy="26" r="8" stroke="#c9a227" strokeWidth="1.8" fill="none" />
-    <circle cx="26" cy="26" r="4" fill="#c9a227" />
-    <path d="M17 26 L35 26 M26 17 L26 35" stroke="#c9a227" strokeWidth="1.2" />
+const CornerTL = () => (
+  <svg width="102" height="102" viewBox="0 0 140 140" style={{ position: 'absolute', top: '8px', left: '8px', zIndex: 2 }}>
+    <g fill="none" stroke="#b8862e" strokeWidth="1.1" opacity=".85">
+      <path d="M0 46 L0 0 L46 0" />
+      <path d="M0 58 L0 8 L58 8" strokeWidth=".6" opacity=".65" />
+      <g transform="translate(30,30)">
+        <circle r="17" />
+        <rect x="-12" y="-12" width="24" height="24" />
+        <rect x="-12" y="-12" width="24" height="24" transform="rotate(45)" />
+        <circle r="2.4" fill="#b8862e" stroke="none" />
+      </g>
+    </g>
   </svg>
 )
 
-const CornerTopRight = () => (
-  <svg width="76" height="76" viewBox="0 0 76 76" fill="none" style={{ position: 'absolute', top: '14px', right: '14px' }}>
-    <path d="M76 0 L0 0 L0 6 L70 6 L70 76 L76 76 Z" fill="#c9a227" />
-    <path d="M66 10 L10 10 L10 13 L63 13 L63 66 L66 66 Z" fill="#14532d" />
-    <circle cx="50" cy="26" r="8" stroke="#c9a227" strokeWidth="1.8" fill="none" />
-    <circle cx="50" cy="26" r="4" fill="#c9a227" />
-    <path d="M41 26 L59 26 M50 17 L50 35" stroke="#c9a227" strokeWidth="1.2" />
+const CornerTR = () => (
+  <svg width="102" height="102" viewBox="0 0 140 140" style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 2, transform: 'scaleX(-1)' }}>
+    <g fill="none" stroke="#b8862e" strokeWidth="1.1" opacity=".85">
+      <path d="M0 46 L0 0 L46 0" />
+      <path d="M0 58 L0 8 L58 8" strokeWidth=".6" opacity=".65" />
+      <g transform="translate(30,30)">
+        <circle r="17" />
+        <rect x="-12" y="-12" width="24" height="24" />
+        <rect x="-12" y="-12" width="24" height="24" transform="rotate(45)" />
+        <circle r="2.4" fill="#b8862e" stroke="none" />
+      </g>
+    </g>
   </svg>
 )
 
-const CornerBottomLeft = () => (
-  <svg width="76" height="76" viewBox="0 0 76 76" fill="none" style={{ position: 'absolute', bottom: '14px', left: '14px' }}>
-    <path d="M0 76 L76 76 L76 70 L6 70 L6 0 L0 0 Z" fill="#c9a227" />
-    <path d="M10 66 L66 66 L66 63 L13 63 L13 10 L10 10 Z" fill="#14532d" />
-    <circle cx="26" cy="50" r="8" stroke="#c9a227" strokeWidth="1.8" fill="none" />
-    <circle cx="26" cy="50" r="4" fill="#c9a227" />
-    <path d="M17 50 L35 50 M26 41 L26 59" stroke="#c9a227" strokeWidth="1.2" />
+const CornerBL = () => (
+  <svg width="102" height="102" viewBox="0 0 140 140" style={{ position: 'absolute', bottom: '8px', left: '8px', zIndex: 2, transform: 'scaleY(-1)' }}>
+    <g fill="none" stroke="#b8862e" strokeWidth="1.1" opacity=".85">
+      <path d="M0 46 L0 0 L46 0" />
+      <path d="M0 58 L0 8 L58 8" strokeWidth=".6" opacity=".65" />
+      <g transform="translate(30,30)">
+        <circle r="17" />
+        <rect x="-12" y="-12" width="24" height="24" />
+        <rect x="-12" y="-12" width="24" height="24" transform="rotate(45)" />
+        <circle r="2.4" fill="#b8862e" stroke="none" />
+      </g>
+    </g>
   </svg>
 )
 
-const CornerBottomRight = () => (
-  <svg width="76" height="76" viewBox="0 0 76 76" fill="none" style={{ position: 'absolute', bottom: '14px', right: '14px' }}>
-    <path d="M76 76 L0 76 L0 70 L70 70 L70 0 L76 0 Z" fill="#c9a227" />
-    <path d="M66 66 L10 66 L10 63 L63 63 L63 10 L66 10 Z" fill="#14532d" />
-    <circle cx="50" cy="50" r="8" stroke="#c9a227" strokeWidth="1.8" fill="none" />
-    <circle cx="50" cy="50" r="4" fill="#c9a227" />
-    <path d="M41 50 L59 50 M50 41 L50 59" stroke="#c9a227" strokeWidth="1.2" />
+const CornerBR = () => (
+  <svg width="102" height="102" viewBox="0 0 140 140" style={{ position: 'absolute', bottom: '8px', right: '8px', zIndex: 2, transform: 'scale(-1,-1)' }}>
+    <g fill="none" stroke="#b8862e" strokeWidth="1.1" opacity=".85">
+      <path d="M0 46 L0 0 L46 0" />
+      <path d="M0 58 L0 8 L58 8" strokeWidth=".6" opacity=".65" />
+      <g transform="translate(30,30)">
+        <circle r="17" />
+        <rect x="-12" y="-12" width="24" height="24" />
+        <rect x="-12" y="-12" width="24" height="24" transform="rotate(45)" />
+        <circle r="2.4" fill="#b8862e" stroke="none" />
+      </g>
+    </g>
   </svg>
 )
 
 /**
- * CertificateTemplate (100% Dynamic Precision Vector & CSS Layout)
+ * CertificateTemplate
  *
- * All tables, labels, underlines, checkboxes, and seals are generated directly
- * via rock-solid HTML/CSS to guarantee 100% alignment without any misalignment.
+ * Implements the user's custom HTML/CSS Islamic luxury certificate design.
+ * Features vector Islamic geometry watermark, emerald/gold framing,
+ * Kop Surat with logo, 8-point geometric star score medal, and clean signature spaces.
  */
 export default function CertificateTemplate({ result, id = 'certificate-template' }) {
   if (!result) return null
 
   const totalScore = Number(result.skor_total) || 0
-  const isPassed = totalScore >= 50
-  const activeLevel = getActiveLevelKey(totalScore, result.level)
+  const predikat = getPredikatInfo(totalScore, result.level)
+  const isPassed = predikat.isPassed
   const notesText = parseNotes(result.catatan, isPassed)
+
+  // Scores
+  const skorMakhraj = Number(result.skor_makhraj) || 0
+  const skorTajwid = Number(result.skor_tajwid) || 0
+  const skorKelancaran = Number(result.skor_kelancaran) || 0
 
   // Generate formal certificate number
   const testDate = result.tanggal_tes ? new Date(result.tanggal_tes) : new Date()
@@ -104,10 +160,8 @@ export default function CertificateTemplate({ result, id = 'certificate-template
   const rawId = result.id ? String(result.id) : ''
   const numericSeed = rawId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
   const paddedNo = String((numericSeed % 900) + 100).padStart(3, '0')
-  const certNumber = `421.3 / BQ-${paddedNo} / SMPN2GLG / ${romanMonth} / ${yearStr}`
+  const certNumber = `Nomor: 421.3 / BQ-${paddedNo} / SMPN.2.GLG / ${romanMonth} / ${yearStr}`
   const formattedDate = formatDate(result.tanggal_tes)
-
-  // Clean ayat dibaca string
   const cleanAyat = (result.ayat_dibaca || '').replace(/^📖\s*/, '')
 
   return (
@@ -118,584 +172,449 @@ export default function CertificateTemplate({ result, id = 'certificate-template
         left: '0px',
         top: '0px',
         visibility: 'hidden',
-        width: '1122px',   // A4 landscape @ 96dpi
-        height: '794px',
-        backgroundColor: '#fffef9',
-        fontFamily: "'Plus Jakarta Sans', Arial, Helvetica, sans-serif",
+        width: '1122px',   // A4 landscape @ 96dpi (297mm)
+        height: '794px',   // A4 landscape @ 96dpi (210mm)
+        backgroundColor: '#0b4a38',
         boxSizing: 'border-box',
         overflow: 'hidden',
         zIndex: -9999,
         pointerEvents: 'none',
-        color: '#0f172a',
+        color: '#241f18',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
       }}
     >
-      {/* ── Outer Decorative Multi-Border Frame ── */}
-      <div style={{ position: 'absolute', inset: '10px', border: '4.5px solid #14532d', borderRadius: '10px', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', inset: '16px', border: '1.5px solid #c9a227', borderRadius: '6px', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', inset: '22px', border: '0.75px dashed rgba(201,162,39,0.5)', borderRadius: '4px', pointerEvents: 'none' }} />
-
-      {/* ── 4 Crisp Corner Flourishes ── */}
-      <CornerTopLeft />
-      <CornerTopRight />
-      <CornerBottomLeft />
-      <CornerBottomRight />
-
-      {/* ── Subtle Geometric Background Watermark ── */}
+      {/* ── Outer Gold Hairline ── */}
       <div
         style={{
           position: 'absolute',
-          inset: '30px',
-          opacity: 0.03,
-          backgroundImage: "radial-gradient(#14532d 1px, transparent 1px)",
-          backgroundSize: '24px 24px',
+          inset: '9px',
+          border: '1.3px solid #b8862e',
+          opacity: 0.8,
           pointerEvents: 'none',
         }}
       />
 
-      {/* ── Center Large Watermark Logo ── */}
+      {/* ── Inner Frame (Parchment Texture) ── */}
       <div
         style={{
           position: 'absolute',
-          left: '50%',
-          top: '48%',
-          marginLeft: '-140px',
-          marginTop: '-140px',
-          width: '280px',
-          height: '280px',
-          opacity: 0.035,
-          pointerEvents: 'none',
-        }}
-      >
-        <img
-          src="/logo-smpn2glagah.png"
-          alt="Watermark"
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        />
-      </div>
-
-      {/* ── Inner Content Container (Shifted Upwards with Generous Bottom Clearance) ── */}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          padding: '20px 44px 34px 44px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
+          inset: '17px',
+          backgroundColor: '#fbf3e0',
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(184,134,46,.035) 0 2px, transparent 2px 26px),
+            repeating-linear-gradient(-45deg, rgba(184,134,46,.035) 0 2px, transparent 2px 26px)
+          `,
+          border: '2.2px solid #b8862e',
+          overflow: 'hidden',
           boxSizing: 'border-box',
         }}
       >
-        {/* ══════════════════════════════════════════════════════════
-            HEADER SECTION: Kop Surat & Pill Badges
-            ══════════════════════════════════════════════════════════ */}
-        <div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2px' }}>
-            <tbody>
-              <tr>
-                {/* Top Left: Nomor Sertifikat Box */}
-                <td style={{ width: '230px', verticalAlign: 'top', padding: 0 }}>
-                  <p style={{ fontSize: '9px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
-                    Nomor Sertifikat:
-                  </p>
-                  <div
-                    style={{
-                      border: '1.5px solid #c9a227',
-                      borderRadius: '8px',
-                      backgroundColor: '#fffdf5',
-                      padding: '3px 8px',
-                      textAlign: 'center',
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      color: '#14532d',
-                      fontFamily: 'monospace',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                    }}
-                  >
-                    {certNumber}
-                  </div>
-                </td>
-
-                {/* Center: Logo & Official Letterhead */}
-                <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                    <img
-                      src="/logo-smpn2glagah.png"
-                      alt="Logo SMPN 2 Glagah"
-                      style={{ width: '54px', height: '54px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
-                    />
-                    <div style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.14em', color: '#475569', margin: 0, textTransform: 'uppercase' }}>
-                        Pemerintah Kabupaten Banyuwangi · Dinas Pendidikan
-                      </p>
-                      <h1 style={{
-                        fontSize: '20px',
-                        fontWeight: 900,
-                        color: '#14532d',
-                        margin: '1px 0',
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        letterSpacing: '0.04em',
-                      }}>
-                        SMP NEGERI 2 GLAGAH
-                      </h1>
-                      <p style={{ fontSize: '9px', color: '#64748b', margin: 0, fontWeight: 500 }}>
-                        Jl. Raya Glagah, Kec. Glagah, Kab. Banyuwangi, Jawa Timur · Kode Pos 68432 · Web: smpn2glagah.sch.id
-                      </p>
-                    </div>
-                  </div>
-                </td>
-
-                {/* Top Right: Tanggal Terbit Box */}
-                <td style={{ width: '230px', verticalAlign: 'top', padding: 0, textAlign: 'right' }}>
-                  <p style={{ fontSize: '9px', fontWeight: 700, color: '#475569', margin: '0 0 2px 0' }}>
-                    Tanggal Terbit:
-                  </p>
-                  <div
-                    style={{
-                      border: '1.5px solid #c9a227',
-                      borderRadius: '8px',
-                      backgroundColor: '#fffdf5',
-                      padding: '3px 8px',
-                      textAlign: 'center',
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      color: '#14532d',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                    }}
-                  >
-                    {formattedDate}
-                  </div>
-                  <p style={{ fontSize: '9px', color: '#64748b', margin: '2px 0 0 0', fontWeight: 600 }}>
-                    Banyuwangi, {formattedDate}
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* Gold Header Divider Line */}
-          <div style={{ width: '100%', height: '1.5px', background: 'linear-gradient(to right, transparent, #c9a227 20%, #c9a227 80%, transparent)', margin: '2px 0 0 0' }} />
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════
-            TITLE & BANNER SECTION
-            ══════════════════════════════════════════════════════════ */}
-        <div style={{ textAlign: 'center', margin: '0' }}>
-          <h2 style={{
-            fontSize: '23px',
-            fontWeight: 900,
-            color: isPassed ? '#14532d' : '#991b1b',
-            fontFamily: "'Playfair Display', Georgia, serif",
-            letterSpacing: '0.12em',
-            margin: 0,
-            textTransform: 'uppercase',
-          }}>
-            {isPassed ? 'SERTIFIKAT KELULUSAN' : 'HASIL EVALUASI TILAWAH AL-QUR\'AN'}
-          </h2>
-
-          {/* Emerald & Gold Ribbon Banner */}
-          <div style={{
-            display: 'inline-block',
-            backgroundColor: isPassed ? '#14532d' : '#991b1b',
-            border: '1.5px solid #c9a227',
-            borderRadius: '20px',
-            padding: '2.5px 30px',
-            margin: '2px 0 1px 0',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.12)',
-          }}>
-            <span style={{
-              fontSize: '10.5px',
-              fontWeight: 900,
-              color: '#fef08a',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-            }}>
-              TES KEMAMPUAN BACA AL QURAN
-            </span>
-          </div>
-
-          <p style={{ fontSize: '9.5px', color: '#475569', margin: '1px 0 0 0', fontStyle: 'italic' }}>
-            Diberikan kepada:
-          </p>
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════
-            IDENTITAS SISWA & MATERI UJIAN
-            ══════════════════════════════════════════════════════════ */}
+        {/* Watermark Islamic 8-Point Star */}
         <div
           style={{
-            backgroundColor: '#ffffff',
-            border: '1.5px solid #c9a227',
-            borderRadius: '10px',
-            padding: '7px 16px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
-            position: 'relative',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '560px',
+            height: '560px',
+            marginLeft: '-280px',
+            marginTop: '-280px',
+            opacity: 0.04,
+            pointerEvents: 'none',
+            zIndex: 0,
           }}
         >
-          {/* Badge Label: Identitas Siswa */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '-9px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#14532d',
-              border: '1px solid #c9a227',
-              borderRadius: '12px',
-              padding: '1px 16px',
-              fontSize: '8.5px',
-              fontWeight: 800,
-              color: '#fef3c7',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-            }}
-          >
-            IDENTITAS SISWA &amp; MATERI UJIAN
-          </div>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '2px' }}>
-            <tbody>
-              {/* Row 1: Nama Lengkap Siswa */}
-              <tr>
-                <td style={{ width: '145px', fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '2px 0' }}>
-                  Nama Lengkap Siswa
-                </td>
-                <td style={{ width: '15px', fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '2px 0' }}>:</td>
-                <td colSpan={4} style={{ padding: '2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{
-                    fontSize: '15.5px',
-                    fontWeight: 900,
-                    color: '#14532d',
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    letterSpacing: '0.03em',
-                    textTransform: 'uppercase',
-                  }}>
-                    {result.murid?.nama || result.nama_murid || '-'}
-                  </span>
-                </td>
-              </tr>
-
-              {/* Row 2: Kelas & NISN */}
-              <tr>
-                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>
-                  Kelas
-                </td>
-                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>:</td>
-                <td style={{ width: '220px', padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#0f172a' }}>
-                    {result.murid?.kelas || result.kelas_murid || '-'}
-                  </span>
-                </td>
-                <td style={{ width: '80px', fontSize: '10.5px', fontWeight: 700, color: '#334155', textAlign: 'right', padding: '3px 10px 2px 0' }}>
-                  NISN :
-                </td>
-                <td colSpan={2} style={{ padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace' }}>
-                    {result.murid?.nisn || result.nisn_murid || '-'}
-                  </span>
-                </td>
-              </tr>
-
-              {/* Row 3: Surat & Ayat yang Diuji */}
-              <tr>
-                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>
-                  Surat &amp; Ayat yang Diuji
-                </td>
-                <td style={{ fontSize: '10.5px', fontWeight: 700, color: '#334155', padding: '3px 0 2px 0' }}>:</td>
-                <td colSpan={4} style={{ padding: '3px 0 2px 0', borderBottom: '1px solid #cbd5e1' }}>
-                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#14532d', fontStyle: 'italic' }}>
-                    📖 {cleanAyat ? `QS. ${cleanAyat}` : 'Al-Qur\'an'}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div style={{ position: 'absolute', inset: '80px', backgroundColor: '#8c6518' }} />
+          <div style={{ position: 'absolute', inset: '80px', backgroundColor: '#8c6518', transform: 'rotate(45deg)' }} />
         </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            EVALUATION BREAKDOWN: RINCIAN SKOR (LEFT) & PREDIKAT (RIGHT)
-            ══════════════════════════════════════════════════════════ */}
-        <div style={{ display: 'flex', gap: '14px', alignItems: 'stretch' }}>
+        {/* 4 Corner Ornaments */}
+        <CornerTL />
+        <CornerTR />
+        <CornerBL />
+        <CornerBR />
 
-          {/* LEFT TABLE: Rincian Skor & Capaian */}
+        {/* ── Main Content Area ── */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            height: '100%',
+            padding: '24px 60px 26px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Top Metadata */}
           <div
             style={{
-              flex: 1.1,
-              backgroundColor: '#ffffff',
-              border: '1.5px solid #14532d',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-            }}
-          >
-            {/* Table Header */}
-            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '3px 8px', textAlign: 'center', fontSize: '9px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              RINCIAN SKOR &amp; CAPAIAN
-            </div>
-
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #cbd5e1' }}>
-                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'left' }}>ASPEK PENILAIAN</th>
-                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'center', width: '60px' }}>BOBOT</th>
-                  <th style={{ fontSize: '9px', fontWeight: 800, color: '#475569', padding: '3px 8px', textAlign: 'center', width: '90px' }}>SKOR (0–100)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Makharijul Huruf</td>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>35%</td>
-                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
-                    {result.skor_makhraj ?? '-'}
-                  </td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Kaidah Tajwid</td>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>40%</td>
-                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
-                    {result.skor_tajwid ?? '-'}
-                  </td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#334155', padding: '3px 8px' }}>Kelancaran &amp; Adab</td>
-                  <td style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', padding: '3px 8px', textAlign: 'center' }}>25%</td>
-                  <td style={{ fontSize: '11.5px', fontWeight: 900, color: '#0f172a', padding: '3px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
-                    {result.skor_kelancaran ?? '-'}
-                  </td>
-                </tr>
-                {/* Total Row */}
-                <tr style={{ backgroundColor: isPassed ? '#f0fdf4' : '#fef2f2' }}>
-                  <td style={{ fontSize: '10.5px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px' }}>TOTAL SKOR AKHIR</td>
-                  <td style={{ fontSize: '10px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px', textAlign: 'center' }}>100%</td>
-                  <td style={{ fontSize: '13.5px', fontWeight: 900, color: isPassed ? '#14532d' : '#991b1b', padding: '4px 8px', textAlign: 'center', fontFamily: 'monospace' }}>
-                    {totalScore}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* RIGHT TABLE: Predikat / Level Capaian Checkboxes */}
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: '#ffffff',
-              border: '1.5px solid #14532d',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
+              width: '100%',
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'space-between',
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: '10.5px',
+              letterSpacing: '0.02em',
+              color: '#083328',
+              opacity: 0.85,
+              marginBottom: '2px',
             }}
           >
-            {/* Table Header */}
-            <div style={{ backgroundColor: '#14532d', color: '#fef3c7', padding: '3px 8px', textAlign: 'center', fontSize: '9px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              PREDIKAT / LEVEL CAPAIAN
-            </div>
-
-            <div style={{ padding: '3px 10px', display: 'flex', flexDirection: 'column', gap: '2.5px', flex: 1, justifyContent: 'space-around' }}>
-              {/* Row 1: Mumtaz */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{
-                    width: '13px', height: '13px', borderRadius: '3px',
-                    border: activeLevel === 'mumtaz' ? '1.5px solid #d97706' : '1.5px solid #94a3b8',
-                    backgroundColor: activeLevel === 'mumtaz' ? '#d97706' : '#ffffff',
-                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {activeLevel === 'mumtaz' ? '✓' : ''}
-                  </div>
-                  <span style={{ fontWeight: activeLevel === 'mumtaz' ? 800 : 500, color: activeLevel === 'mumtaz' ? '#d97706' : '#334155' }}>
-                    Mumtaz (Tartil)
-                  </span>
-                </div>
-                <span style={{ color: '#64748b', fontWeight: 600, fontFamily: 'monospace' }}>(91 – 100)</span>
-              </div>
-
-              {/* Row 2: Mahir */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{
-                    width: '13px', height: '13px', borderRadius: '3px',
-                    border: activeLevel === 'mahir' ? '1.5px solid #16a34a' : '1.5px solid #94a3b8',
-                    backgroundColor: activeLevel === 'mahir' ? '#16a34a' : '#ffffff',
-                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {activeLevel === 'mahir' ? '✓' : ''}
-                  </div>
-                  <span style={{ fontWeight: activeLevel === 'mahir' ? 800 : 500, color: activeLevel === 'mahir' ? '#16a34a' : '#334155' }}>
-                    Mahir
-                  </span>
-                </div>
-                <span style={{ color: '#64748b', fontWeight: 600, fontFamily: 'monospace' }}>(76 – 90)</span>
-              </div>
-
-              {/* Row 3: Menengah */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{
-                    width: '13px', height: '13px', borderRadius: '3px',
-                    border: activeLevel === 'menengah' ? '1.5px solid #ea580c' : '1.5px solid #94a3b8',
-                    backgroundColor: activeLevel === 'menengah' ? '#ea580c' : '#ffffff',
-                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {activeLevel === 'menengah' ? '✓' : ''}
-                  </div>
-                  <span style={{ fontWeight: activeLevel === 'menengah' ? 800 : 500, color: activeLevel === 'menengah' ? '#ea580c' : '#334155' }}>
-                    Menengah
-                  </span>
-                </div>
-                <span style={{ color: '#64748b', fontWeight: 600, fontFamily: 'monospace' }}>(61 – 75)</span>
-              </div>
-
-              {/* Row 4: Dasar */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{
-                    width: '13px', height: '13px', borderRadius: '3px',
-                    border: activeLevel === 'dasar' ? '1.5px solid #2563eb' : '1.5px solid #94a3b8',
-                    backgroundColor: activeLevel === 'dasar' ? '#2563eb' : '#ffffff',
-                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {activeLevel === 'dasar' ? '✓' : ''}
-                  </div>
-                  <span style={{ fontWeight: activeLevel === 'dasar' ? 800 : 500, color: activeLevel === 'dasar' ? '#2563eb' : '#334155' }}>
-                    Dasar (Cukup)
-                  </span>
-                </div>
-                <span style={{ color: '#64748b', fontWeight: 600, fontFamily: 'monospace' }}>(50 – 60)</span>
-              </div>
-
-              {/* Row 5: Remidi */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '9.5px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{
-                    width: '13px', height: '13px', borderRadius: '3px',
-                    border: activeLevel === 'remidi' ? '1.5px solid #dc2626' : '1.5px solid #94a3b8',
-                    backgroundColor: activeLevel === 'remidi' ? '#dc2626' : '#ffffff',
-                    color: '#ffffff', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {activeLevel === 'remidi' ? '✓' : ''}
-                  </div>
-                  <span style={{ fontWeight: activeLevel === 'remidi' ? 800 : 500, color: activeLevel === 'remidi' ? '#dc2626' : '#334155' }}>
-                    Remidi (Wajib Mengulang)
-                  </span>
-                </div>
-                <span style={{ color: '#64748b', fontWeight: 600, fontFamily: 'monospace' }}>(&lt; 50)</span>
-              </div>
-            </div>
+            <span>{certNumber}</span>
+            <span>Banyuwangi, {formattedDate}</span>
           </div>
-        </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            CATATAN BIMBINGAN / EVALUASI GURU
-            ══════════════════════════════════════════════════════════ */}
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            border: '1.5px solid #c9a227',
-            borderRadius: '8px',
-            padding: '5px 14px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-            position: 'relative',
-          }}
-        >
+          {/* Kop Surat with School Logo */}
+          <header style={{ textAlign: 'center', margin: '0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <img
+                src="/logo-smpn2glagah.png"
+                alt="Logo SMPN 2 Glagah"
+                style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+              />
+              <div style={{ textAlign: 'center' }}>
+                <p style={{
+                  margin: 0,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '9.5px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: '#0b4a38',
+                  opacity: 0.8,
+                  fontWeight: 600,
+                }}>
+                  Pemerintah Kabupaten Banyuwangi · Dinas Pendidikan
+                </p>
+                <h2 style={{
+                  margin: '1px 0 0',
+                  fontFamily: "'Marcellus', serif",
+                  fontSize: '21px',
+                  letterSpacing: '0.06em',
+                  color: '#083328',
+                  fontWeight: 900,
+                }}>
+                  SMP NEGERI 2 GLAGAH
+                </h2>
+                <p style={{
+                  margin: '1px 0 0',
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '9px',
+                  letterSpacing: '0.03em',
+                  color: '#5c5343',
+                }}>
+                  Kecamatan Glagah, Kabupaten Banyuwangi, Jawa Timur · NPSN 20525649 · Web: smpn2glagah.sch.id
+                </p>
+              </div>
+            </div>
+          </header>
+
+          {/* Ornate Divider with Bismillah */}
           <div
             style={{
-              position: 'absolute',
-              top: '-8px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#14532d',
-              border: '1px solid #c9a227',
-              borderRadius: '10px',
-              padding: '1px 14px',
-              fontSize: '8px',
-              fontWeight: 800,
-              color: '#fef3c7',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              width: '100%',
+              maxWidth: '560px',
+              margin: '2px 0 1px',
             }}
           >
-            CATATAN BIMBINGAN / EVALUASI GURU
+            <div style={{ flex: 1, height: '1.3px', background: 'linear-gradient(90deg, transparent, #b8862e, transparent)' }} />
+            <span style={{ fontFamily: "'Amiri', serif", fontSize: '18px', color: '#8c6518', whiteSpace: 'nowrap' }}>
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </span>
+            <div style={{ flex: 1, height: '1.3px', background: 'linear-gradient(90deg, transparent, #b8862e, transparent)' }} />
           </div>
 
-          <p style={{
-            fontSize: '10px',
-            fontStyle: 'italic',
-            fontWeight: 600,
-            color: isPassed ? '#1e293b' : '#991b1b',
-            lineHeight: 1.3,
-            margin: '2px 0 0 0',
-          }}>
-            {notesText}
+          {/* Title Block */}
+          <div style={{ textAlign: 'center', margin: '0' }}>
+            <p style={{
+              margin: 0,
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: '10.5px',
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+              color: '#8c6518',
+              fontWeight: 700,
+            }}>
+              SERTIFIKAT
+            </p>
+            <h1 style={{
+              margin: '1px 0 2px',
+              fontFamily: "'Marcellus', serif",
+              fontSize: '24px',
+              letterSpacing: '0.02em',
+              color: isPassed ? '#083328' : '#7c2432',
+              lineHeight: 1.15,
+              fontWeight: 900,
+            }}>
+              {isPassed ? 'Kemampuan Membaca Al-Qur\'an' : 'Hasil Evaluasi Tilawah Al-Qur\'an'}
+            </h1>
+            <p style={{
+              margin: '0 0 2px',
+              fontFamily: "'Amiri', serif",
+              fontSize: '13px',
+              color: '#0b4a38',
+            }}>
+              وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا
+              <span style={{
+                display: 'block',
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+                fontSize: '10.5px',
+                color: '#6b6355',
+                letterSpacing: '0.02em',
+              }}>
+                "...dan bacalah Al-Qur'an itu dengan tartil." — QS. Al-Muzzammil: 4
+              </span>
+            </p>
+            <p style={{ margin: '2px 0 0', fontSize: '13px', fontStyle: 'italic', color: '#5c5343' }}>
+              Diberikan dengan penuh apresiasi kepada:
+            </p>
+          </div>
+
+          {/* Recipient Section */}
+          <div style={{ textAlign: 'center', margin: '0' }}>
+            <h2 style={{
+              margin: 0,
+              fontFamily: "'Marcellus', serif",
+              fontSize: '27px',
+              letterSpacing: '0.05em',
+              color: '#083328',
+              position: 'relative',
+              display: 'inline-block',
+              paddingBottom: '4px',
+              borderBottom: '1.5px solid #b8862e',
+              textTransform: 'uppercase',
+              fontWeight: 900,
+            }}>
+              {result.murid?.nama || result.nama_murid || '-'}
+            </h2>
+            <p style={{
+              margin: '4px 0 0',
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: '11.5px',
+              letterSpacing: '0.04em',
+              color: '#0b4a38',
+              fontWeight: 600,
+            }}>
+              Kelas <b style={{ color: '#083328' }}>{result.murid?.kelas || result.kelas_murid || '-'}</b> &middot; NISN <b style={{ color: '#083328' }}>{result.murid?.nisn || result.nisn_murid || '-'}</b>
+            </p>
+          </div>
+
+          {/* Materi Ujian */}
+          <p style={{ textAlign: 'center', margin: '0', fontSize: '12.5px', color: '#5c5343' }}>
+            Atas kemampuannya membaca dengan baik dan benar surat serta ayat:
+            <strong style={{
+              display: 'block',
+              marginTop: '2px',
+              fontFamily: "'Marcellus', serif",
+              fontSize: '15px',
+              color: '#083328',
+              letterSpacing: '0.02em',
+            }}>
+              📖 {cleanAyat ? `QS. ${cleanAyat}` : 'Al-Qur\'an'}
+            </strong>
           </p>
+
+          {/* Scores Grid & 8-Point Star Medal */}
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '850px',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr auto',
+              alignItems: 'center',
+              gap: '20px',
+              margin: '0',
+            }}
+          >
+            {/* Makharijul Huruf */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <p style={{
+                margin: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: '10px',
+                letterSpacing: '0.02em',
+                color: '#083328',
+                fontWeight: 700,
+              }}>
+                Makharijul Huruf
+                <span style={{ fontSize: '9px', color: '#8c6518', backgroundColor: '#e8cd8a', borderRadius: '999px', padding: '1px 6px', fontWeight: 700 }}>
+                  35%
+                </span>
+              </p>
+              <div style={{ height: '7px', backgroundColor: '#efdfb8', border: '0.8px solid #b8862e', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, Math.max(0, skorMakhraj))}%`, background: 'linear-gradient(90deg, #3e9e76, #0b4a38)', borderRadius: '999px' }} />
+              </div>
+              <p style={{ margin: 0, textAlign: 'right', fontFamily: "'Marcellus', serif", fontSize: '15px', color: '#083328', fontWeight: 900 }}>
+                {skorMakhraj} <small style={{ fontFamily: "'Poppins', sans-serif", fontSize: '9px', color: '#8a8172' }}>/ 100</small>
+              </p>
+            </div>
+
+            {/* Kaidah Tajwid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <p style={{
+                margin: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: '10px',
+                letterSpacing: '0.02em',
+                color: '#083328',
+                fontWeight: 700,
+              }}>
+                Kaidah Tajwid
+                <span style={{ fontSize: '9px', color: '#8c6518', backgroundColor: '#e8cd8a', borderRadius: '999px', padding: '1px 6px', fontWeight: 700 }}>
+                  40%
+                </span>
+              </p>
+              <div style={{ height: '7px', backgroundColor: '#efdfb8', border: '0.8px solid #b8862e', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, Math.max(0, skorTajwid))}%`, background: 'linear-gradient(90deg, #3e9e76, #0b4a38)', borderRadius: '999px' }} />
+              </div>
+              <p style={{ margin: 0, textAlign: 'right', fontFamily: "'Marcellus', serif", fontSize: '15px', color: '#083328', fontWeight: 900 }}>
+                {skorTajwid} <small style={{ fontFamily: "'Poppins', sans-serif", fontSize: '9px', color: '#8a8172' }}>/ 100</small>
+              </p>
+            </div>
+
+            {/* Kelancaran & Adab */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <p style={{
+                margin: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: '10px',
+                letterSpacing: '0.02em',
+                color: '#083328',
+                fontWeight: 700,
+              }}>
+                Kelancaran &amp; Adab
+                <span style={{ fontSize: '9px', color: '#8c6518', backgroundColor: '#e8cd8a', borderRadius: '999px', padding: '1px 6px', fontWeight: 700 }}>
+                  25%
+                </span>
+              </p>
+              <div style={{ height: '7px', backgroundColor: '#efdfb8', border: '0.8px solid #b8862e', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, Math.max(0, skorKelancaran))}%`, background: 'linear-gradient(90deg, #3e9e76, #0b4a38)', borderRadius: '999px' }} />
+              </div>
+              <p style={{ margin: 0, textAlign: 'right', fontFamily: "'Marcellus', serif", fontSize: '15px', color: '#083328', fontWeight: 900 }}>
+                {skorKelancaran} <small style={{ fontFamily: "'Poppins', sans-serif", fontSize: '9px', color: '#8a8172' }}>/ 100</small>
+              </p>
+            </div>
+
+            {/* 8-Point Star Medal */}
+            <div style={{ position: 'relative', width: '100px', height: '100px', justifySelf: 'center' }}>
+              {/* Star Layer 1 */}
+              <div style={{
+                position: 'absolute', inset: '16px',
+                background: `linear-gradient(135deg, ${predikat.accentA}, ${predikat.accentB})`,
+                boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+              }} />
+              {/* Star Layer 2 (Rotated 45deg) */}
+              <div style={{
+                position: 'absolute', inset: '16px',
+                background: `linear-gradient(135deg, ${predikat.accentA}, ${predikat.accentB})`,
+                transform: 'rotate(45deg)',
+                boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+              }} />
+              {/* Center Disc */}
+              <div style={{
+                position: 'absolute', inset: '24px',
+                borderRadius: '50%',
+                backgroundColor: '#fbf3e0',
+                border: '1.5px solid #b8862e',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                boxShadow: 'inset 0 0 0 1px #0b4a38',
+                zIndex: 2,
+              }}>
+                <p style={{ margin: 0, fontFamily: "'Marcellus', serif", fontSize: '16px', color: '#083328', lineHeight: 1, fontWeight: 900 }}>
+                  {totalScore}
+                </p>
+                <p style={{ margin: '1px 0 0', fontFamily: "'Poppins', sans-serif", fontSize: '7px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a8172', fontWeight: 700 }}>
+                  SKOR AKHIR
+                </p>
+                <p style={{ margin: '1px 0 0', fontFamily: "'Poppins', sans-serif", fontWeight: 800, fontSize: '7.5px', textTransform: 'uppercase', color: predikat.accentB, padding: '0 4px', lineHeight: 1.1 }}>
+                  {predikat.label}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Catatan Evaluasi */}
+          <p style={{
+            maxWidth: '750px',
+            textAlign: 'center',
+            fontStyle: 'italic',
+            fontSize: '12.5px',
+            color: '#4b4335',
+            lineHeight: 1.4,
+            margin: '0',
+          }}>
+            <span style={{ fontFamily: "'Marcellus', serif", fontSize: '18px', color: '#b8862e', fontStyle: 'normal', verticalAlign: '-2px', marginRight: '4px' }}>&ldquo;</span>
+            {notesText}
+            <span style={{ fontFamily: "'Marcellus', serif", fontSize: '18px', color: '#b8862e', fontStyle: 'normal', verticalAlign: '-2px', marginLeft: '4px' }}>&rdquo;</span>
+          </p>
+
+          {/* Signatures Section (Clean, Elevated, No Stamp) */}
+          <div style={{ width: '100%', maxWidth: '800px', display: 'flex', justifyContent: 'space-between', margin: '0' }}>
+            {/* Left: Kepala Sekolah */}
+            <div style={{ width: '45%', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 24px', fontFamily: "'Poppins', sans-serif", fontSize: '11px', color: '#083328', lineHeight: 1.4, fontWeight: 600 }}>
+                Mengetahui,<br />Kepala SMP Negeri 2 Glagah
+              </p>
+              <p style={{
+                margin: 0,
+                fontFamily: "'Marcellus', serif",
+                fontSize: '14.5px',
+                letterSpacing: '0.02em',
+                color: '#083328',
+                borderTop: '1.2px solid #083328',
+                display: 'inline-block',
+                paddingTop: '3px',
+                fontWeight: 900,
+              }}>
+                SRIATUN, S.Pd.
+              </p>
+              <p style={{ margin: '2px 0 0', fontFamily: "'Poppins', sans-serif", fontSize: '10px', color: '#5c5343', fontWeight: 600 }}>
+                NIP. 197006061999032006
+              </p>
+            </div>
+
+            {/* Right: Guru Penguji / PAI */}
+            <div style={{ width: '45%', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 24px', fontFamily: "'Poppins', sans-serif", fontSize: '11px', color: '#083328', lineHeight: 1.4, fontWeight: 600 }}>
+                Guru Penguji<br />Pendidikan Agama Islam
+              </p>
+              <p style={{
+                margin: 0,
+                fontFamily: "'Marcellus', serif",
+                fontSize: '14.5px',
+                letterSpacing: '0.02em',
+                color: '#083328',
+                borderTop: '1.2px solid #083328',
+                display: 'inline-block',
+                paddingTop: '3px',
+                fontWeight: 900,
+              }}>
+                {result.guru_penguji || 'Guru PAI'}
+              </p>
+              <p style={{ margin: '2px 0 0', fontFamily: "'Poppins', sans-serif", fontSize: '10px', color: '#5c5343', fontWeight: 600 }}>
+                Guru Penguji Baca Al-Qur'an
+              </p>
+            </div>
+          </div>
         </div>
-
-        {/* ══════════════════════════════════════════════════════════
-            SIGNATURES SECTION (LIFTED HIGHER & SPACED FROM BOTTOM)
-            ══════════════════════════════════════════════════════════ */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', padding: '0 10px', margin: '0 0 6px 0' }}>
-          <tbody>
-            <tr>
-              {/* Left: Kepala Sekolah */}
-              <td style={{ width: '35%', textAlign: 'center', verticalAlign: 'bottom' }}>
-                <p style={{ fontSize: '9.5px', color: '#475569', margin: 0 }}>Mengetahui,</p>
-                <p style={{ fontSize: '10.5px', fontWeight: 800, color: '#14532d', margin: '1px 0 32px 0' }}>
-                  Kepala SMP Negeri 2 Glagah
-                </p>
-                <p style={{ fontSize: '11.5px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
-                  SRIATUN, S.Pd.
-                </p>
-                <p style={{ fontSize: '9px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
-                  NIP. 197006061999032006
-                </p>
-              </td>
-
-              {/* Center: Medallion Seal */}
-              <td style={{ width: '30%', textAlign: 'center', verticalAlign: 'middle' }}>
-                <div
-                  style={{
-                    display: 'inline-block',
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '50%',
-                    backgroundColor: '#d4af37',
-                    border: '2px solid #78350f',
-                    padding: '5px',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <img
-                    src="/logo-smpn2glagah.png"
-                    alt="Seal"
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                </div>
-                <p style={{ fontSize: '7px', fontWeight: 800, color: '#78350f', letterSpacing: '0.08em', margin: '2px 0 0 0', textTransform: 'uppercase' }}>
-                  SMPN 2 GLAGAH
-                </p>
-              </td>
-
-              {/* Right: Guru Penguji / PAI */}
-              <td style={{ width: '35%', textAlign: 'center', verticalAlign: 'bottom' }}>
-                <p style={{ fontSize: '9.5px', color: '#475569', margin: 0 }}>
-                  Banyuwangi, {formattedDate}
-                </p>
-                <p style={{ fontSize: '10.5px', fontWeight: 800, color: '#14532d', margin: '1px 0 32px 0' }}>
-                  Guru Penguji / PAI
-                </p>
-                <p style={{ fontSize: '11.5px', fontWeight: 800, color: '#0f172a', margin: 0, textDecoration: 'underline' }}>
-                  {result.guru_penguji || 'Guru PAI'}
-                </p>
-                <p style={{ fontSize: '9px', color: '#64748b', margin: '1px 0 0 0', fontWeight: 600 }}>
-                  Guru Pendidikan Agama Islam
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
   )
