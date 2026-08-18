@@ -91,7 +91,12 @@ Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
 }
 `.trim()
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
+  const candidateModels = [
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
+    'gemini-2.0-flash-exp',
+    'gemini-1.5-pro',
+  ]
 
   const requestBody = {
     contents: [
@@ -115,26 +120,38 @@ Kembalikan jawaban HANYA berupa JSON valid dengan skema berikut:
     },
   }
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  })
+  let lastError = null
+  let data = null
 
-  if (!response.ok) {
-    let errorDetails = ''
+  // Try candidate models in order
+  for (const modelName of candidateModels) {
     try {
-      const errJson = await response.json()
-      errorDetails = errJson.error?.message || JSON.stringify(errJson)
-    } catch {
-      errorDetails = response.statusText
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      if (response.ok) {
+        data = await response.json()
+        break
+      } else {
+        const errJson = await response.json().catch(() => ({}))
+        const msg = errJson.error?.message || response.statusText
+        lastError = new Error(`Model ${modelName} (${response.status}): ${msg}`)
+        console.warn(`[GeminiEvaluator] ${modelName} failed (${response.status}), trying next fallback...`)
+      }
+    } catch (fetchErr) {
+      lastError = fetchErr
     }
-    throw new Error(`Gagal memproses audio dengan Gemini AI (${response.status}): ${errorDetails}`)
   }
 
-  const data = await response.json()
+  if (!data) {
+    throw lastError || new Error('Gagal menghubungi layanan Gemini AI.')
+  }
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
 
   if (!rawText) {

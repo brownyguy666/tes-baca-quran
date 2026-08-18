@@ -244,7 +244,7 @@ export default function AudioAssessmentRecorder({
                     color: '#c7d2fe',
                   }}
                 >
-                  Gemini 2.0
+                  Gemini AI
                 </span>
               </h3>
             </div>
