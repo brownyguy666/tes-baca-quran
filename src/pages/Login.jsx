@@ -54,14 +54,19 @@ export default function Login() {
         <div className="card p-8 shadow-2xl">
           {/* Logo & heading */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl
-                            bg-gradient-to-br from-islamic-600 to-islamic-800 shadow-glow-green mb-4
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl
+                            bg-slate-900/60 border border-amber-500/30 p-2 shadow-2xl mb-4
                             animate-pulse-glow">
-              <BookOpen className="w-9 h-9 text-gold-400" />
+              <img
+                src="/logo-smpn2glagah.png"
+                alt="Logo SMPN 2 Glagah"
+                className="w-full h-full object-contain"
+                style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}
+              />
             </div>
 
             <div className="divider-ornament text-xs text-gold-600/60 font-arabic mb-3 px-4">
-              بِسْمِ اللّٰهِ
+              بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
             </div>
 
             <h1 className="text-2xl font-bold font-display text-islamic-50 mb-1">

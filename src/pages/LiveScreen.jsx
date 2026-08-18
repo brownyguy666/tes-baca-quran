@@ -101,15 +101,12 @@ export default function LiveScreen() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs"
-              style={{
-                background: 'linear-gradient(135deg, #d4af37, #b45309)',
-                color: '#0b0f19',
-              }}
-            >
-              📖
-            </div>
+            <img
+              src="/logo-smpn2glagah.png"
+              alt="Logo SMPN 2 Glagah"
+              className="w-8 h-8 object-contain"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
+            />
             <div>
               <h1 className="font-bold text-sm leading-tight text-amber-100 flex items-center gap-2">
                 SMP Negeri 2 Glagah
